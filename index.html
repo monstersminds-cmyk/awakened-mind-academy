@@ -221,8 +221,8 @@
     </div>
     <div>
       <div class="form-success">Message sent! Professor Kungu will be in touch shortly.</div>
-      <form class="contact-form">
-        <div class="form-row">
+      <form clcontact-form"></form>ass="
+      <form class="contact-form" action="https://formspree.io/f/xeewlnng" method="POST">
           <div class="form-group"><label>Name</label><input type="text" placeholder="Your full name" required></div>
           <div class="form-group"><label>Email</label><input type="email" placeholder="your@email.com" required></div>
         </div>
@@ -249,6 +249,7 @@
           </select>
         </div>
         <div class="form-group"><label>Tell us about your situation</label><textarea placeholder="Describe your current challenge..."></textarea></div>
+        <input type="hidden" name="_next" value="https://api.whatsapp.com/send?phone=254796776986&text=Hi%20Professor%20Kungu%2C%20I%20just%20filled%20your%20contact%20form%20and%20would%20like%20to%20book%20a%20session.">
         <button type="submit" class="btn btn-gold" style="width:100%;">Start Your Transformation</button>
       </form>
     </div>
