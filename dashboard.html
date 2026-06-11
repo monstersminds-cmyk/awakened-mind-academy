@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Awakened Mind Academy</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/png" href="images/AWAKENED_LOGO2.png">
+  <style>
+    .dashboard{padding:7rem 5% 4rem;max-width:1100px;margin:0 auto}
+    .dashboard-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:3rem;flex-wrap:wrap;gap:1rem}
+    .dashboard-header h1{font-size:clamp(1.6rem,3vw,2.2rem)}
+    .welcome-name{color:var(--gold)}
+    .dashboard-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.5rem;margin-bottom:3rem}
+    .dash-card{background:var(--bg2);border:1px solid rgba(201,168,76,0.12);border-radius:var(--radius);padding:1.8rem;cursor:pointer;transition:border-color 0.2s,transform 0.2s;text-decoration:none;display:block}
+    .dash-card:hover{border-color:rgba(201,168,76,0.4);transform:translateY(-3px)}
+    .dash-card-icon{font-size:2rem;margin-bottom:1rem}
+    .dash-card h3{font-size:1rem;margin-bottom:0.4rem;color:var(--gold)}
+    .dash-card p{font-size:0.85rem;color:var(--text-dim)}
+    .dash-card .coming-soon{font-size:0.7rem;background:rgba(201,168,76,0.1);color:var(--gold);border:1px solid rgba(201,168,76,0.3);padding:0.2rem 0.6rem;border-radius:20px;display:inline-block;margin-top:0.6rem}
+  </style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">Awakened Mind Academy</a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="dashboard.html" class="active">Dashboard</a>
+    <a href="pages/contact.html">Contact</a>
+    <button onclick="logout()" class="btn btn-outline" style="font-size:0.8rem;padding:0.5rem 1.2rem;">Logout</button>
+  </div>
+  <button class="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+
+<div class="dashboard">
+  <div class="dashboard-header">
+    <div>
+      <p class="section-eyebrow">Your Personal Space</p>
+      <h1>Welcome back, <span class="welcome-name" id="user-name">...</span></h1>
+    </div>
+    <img src="images/AWAKENED_LOGO2.png" alt="AMA" style="width:60px;opacity:0.8;">
+  </div>
+
+  <div class="dashboard-grid">
+    <a href="habit-tracker.html" class="dash-card">
+      <div class="dash-card-icon">⚙️</div>
+      <h3>Habit Tracker</h3>
+      <p>Track your daily habits and build streaks that rewire your brain over time.</p>
+    </a>
+    <a href="todo.html" class="dash-card">
+      <div class="dash-card-icon">✅</div>
+      <h3>To-Do & Not-To-Do List</h3>
+      <p>Manage what you must do and what you must avoid every single day.</p>
+    </a>
+    <div class="dash-card">
+      <div class="dash-card-icon">⏰</div>
+      <h3>Alarm & Reminders</h3>
+      <p>Set alarms tied to your habits and coaching sessions.</p>
+      <span class="coming-soon">Coming Soon</span>
+    </div>
+    <div class="dash-card">
+      <div class="dash-card-icon">📖</div>
+      <h3>Book Page</h3>
+      <p>Access Professor Kungu's books and written resources.</p>
+      <span class="coming-soon">Coming Soon</span>
+    </div>
+    <div class="dash-card">
+      <div class="dash-card-icon">🎥</div>
+      <h3>Video Lessons</h3>
+      <p>Watch full coaching sessions and psychology lessons uploaded by Professor Kungu.</p>
+      <span class="coming-soon">Coming Soon</span>
+    </div>
+    <a href="pages/contact.html" class="dash-card">
+      <div class="dash-card-icon">🧠</div>
+      <h3>Book a Session</h3>
+      <p>Ready to go deeper? Book a one-on-one coaching session with Professor Kungu.</p>
+    </a>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const supabase = window.supabase.createClient(
+  'https://ffpppcbegvjskeujlqif.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZmcHBwY2JlZ3Zqc2tldWpscWlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExODM3MTQsImV4cCI6MjA5Njc1OTcxNH0.FZu3uNtxJ8KeYx-c2d79YC3ThKzC98W4Azaxzsoot2A'
+);
+
+async function getUser(){
+  const {data:{session}} = await supabase.auth.getSession();
+  if(!session) window.location.href = 'auth.html';
+  else{
+    const name = session.user.user_metadata?.full_name || session.user.email;
+    document.getElementById('user-name').textContent = name;
+  }
+}
+
+async function logout(){
+  await supabase.auth.signOut();
+  window.location.href = 'auth.html';
+}
+
+getUser();
+</script>
+<script src="js/main.js"></script>
+</body>
+</html>
