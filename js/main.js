@@ -8,16 +8,3 @@ if(hamburger){
     }
   });
 }
-
-const form = document.querySelector('.contact-form');
-if(form){
-  form.addEventListener('submit',(e)=>{
-    e.preventDefault();
-    const success = document.querySelector('.form-success');
-    if(success){
-      success.style.display='block';
-      form.reset();
-      setTimeout(()=>success.style.display='none',5000);
-    }
-  });
-}
