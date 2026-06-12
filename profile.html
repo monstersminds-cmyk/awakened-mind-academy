@@ -157,19 +157,31 @@ function initPage() {
     btn.textContent = 'Verifying...';
     btn.disabled = true;
 
-    db.auth.signInWithPassword({
-      email: currentUser.email,
-      password: password
-    }).then(function(result) {
-      btn.textContent = 'Verify & Edit Profile';
-      btn.disabled = false;
-      if (result.error) {
-        showGateMessage('Incorrect password. Please try again.', 'error');
+    db.auth.getSession().then(function(sessionResult) {
+      var session = sessionResult.data.session;
+      if (!session) {
+        btn.textContent = 'Verify & Edit Profile';
+        btn.disabled = false;
+        showGateMessage('Session expired. Please log in again.', 'error');
+        setTimeout(function() { window.location.href = 'auth.html'; }, 2000);
         return;
       }
-      document.getElementById('gate-section').classList.add('hidden');
-      document.getElementById('profile-section').classList.remove('hidden');
-      loadProfile();
+      var email = session.user.email;
+      db.auth.signInWithPassword({
+        email: email,
+        password: password
+      }).then(function(result) {
+        btn.textContent = 'Verify & Edit Profile';
+        btn.disabled = false;
+        if (result.error) {
+          showGateMessage('Incorrect password. Please try again.', 'error');
+          return;
+        }
+        currentUser = result.data.user;
+        document.getElementById('gate-section').classList.add('hidden');
+        document.getElementById('profile-section').classList.remove('hidden');
+        loadProfile();
+      });
     });
   });
 
