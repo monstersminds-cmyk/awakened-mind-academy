@@ -6,6 +6,7 @@
   <title>My Profile — Awakened Mind Academy</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="icon" type="image/png" href="images/AWAKENED_LOGO2.png">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     .profile-container{min-height:100vh;padding:7rem 5% 4rem;max-width:700px;margin:0 auto}
     .profile-header{margin-bottom:2.5rem}
@@ -30,7 +31,7 @@
     <a href="index.html">Home</a>
     <a href="dashboard.html">Dashboard</a>
     <a href="profile.html" class="active">Profile</a>
-    <button onclick="logoutUser()" class="btn btn-outline" style="font-size:0.8rem;padding:0.5rem 1.2rem;">Logout</button>
+    <button id="logout-btn" class="btn btn-outline" style="font-size:0.8rem;padding:0.5rem 1.2rem;">Logout</button>
   </div>
   <button class="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
 </nav>
@@ -65,7 +66,7 @@
     </div>
     <div class="form-group">
       <label>Email</label>
-      <input type="email" id="email" placeholder="your@email.com" disabled style="opacity:0.6;cursor:not-allowed;">
+      <input type="email" id="email" disabled style="opacity:0.6;cursor:not-allowed;">
     </div>
     <div class="form-group">
       <label>Phone Number</label>
@@ -75,98 +76,136 @@
       <label>About Me (optional)</label>
       <textarea id="about-me" placeholder="Tell Professor Kungu a little about yourself and your goals..." style="min-height:90px;"></textarea>
     </div>
-    <button type="submit" class="btn btn-gold" style="width:100%;">Save Profile</button>
+    <button type="button" id="save-btn" class="btn btn-gold" style="width:100%;">Save Profile</button>
   </form>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-window.addEventListener('load', function(){
-  const _supabase = window.supabase.createClient(
-    'https://ffpppcbegvjskeujlqif.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZmcHBwY2JlZ3Zqc2tldWpscWlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExODM3MTQsImV4cCI6MjA5Njc1OTcxNH0.FZu3uNtxJ8KeYx-c2d79YC3ThKzC98W4Azaxzsoot2A'
-  );
+var SUPA_URL = 'https://ffpppcbegvjskeujlqif.supabase.co';
+var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZmcHBwY2JlZ3Zqc2tldWpscWlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExODM3MTQsImV4cCI6MjA5Njc1OTcxNH0.FZu3uNtxJ8KeYx-c2d79YC3ThKzC98W4Azaxzsoot2A';
+var db;
+var currentUser;
 
-  function showMessage(text, type){
-    const msg = document.getElementById('profile-message');
-    msg.textContent = text;
-    msg.className = 'profile-message ' + type;
-    msg.style.display = 'block';
-    setTimeout(()=>{ msg.style.display='none'; }, 4000);
+function showMessage(text, type){
+  var msg = document.getElementById('profile-message');
+  msg.textContent = text;
+  msg.className = 'profile-message ' + type;
+  msg.style.display = 'block';
+  setTimeout(function(){ msg.style.display = 'none'; }, 5000);
+}
+
+function initApp(){
+  db = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+
+  db.auth.getSession().then(function(result){
+    var session = result.data.session;
+    if(!session){
+      window.location.href = 'auth.html';
+      return;
+    }
+    currentUser = session.user;
+    document.getElementById('email').value = currentUser.email;
+    loadProfile();
+  });
+
+  document.getElementById('logout-btn').addEventListener('click', function(){
+    db.auth.signOut().then(function(){
+      window.location.href = 'auth.html';
+    });
+  });
+
+  document.getElementById('save-btn').addEventListener('click', function(){
+    saveProfile();
+  });
+
+  document.getElementById('avatar-input').addEventListener('change', function(e){
+    uploadAvatar(e.target.files[0]);
+  });
+
+  var hamburger = document.querySelector('.hamburger');
+  var navLinks = document.querySelector('.nav-links');
+  if(hamburger){
+    hamburger.addEventListener('click', function(){
+      navLinks.classList.toggle('open');
+    });
   }
+}
 
-  async function logoutUser(){
-    await _supabase.auth.signOut();
-    window.location.href = 'auth.html';
-  }
-  window.logoutUser = logoutUser;
-
-  async function loadProfile(){
-    const {data:{session}} = await _supabase.auth.getSession();
-    if(!session){ window.location.href='auth.html'; return; }
-    const user = session.user;
-    document.getElementById('email').value = user.email;
-    const {data} = await _supabase.from('profiles').select('*').eq('id', user.id).single();
+function loadProfile(){
+  db.from('profiles').select('*').eq('id', currentUser.id).single().then(function(result){
+    var data = result.data;
     if(data){
       document.getElementById('full-name').value = data.full_name || '';
       document.getElementById('username').value = data.username || '';
       document.getElementById('phone').value = data.phone || '';
       document.getElementById('about-me').value = data.about_me || '';
       if(data.avatar_url){
-        document.getElementById('avatar-display').innerHTML = '<img src="'+data.avatar_url+'" alt="Avatar">';
+        document.getElementById('avatar-display').innerHTML = '<img src="' + data.avatar_url + '" alt="Avatar">';
       } else {
-        document.getElementById('avatar-display').textContent = (data.full_name || user.email).charAt(0).toUpperCase();
+        document.getElementById('avatar-display').textContent = (data.full_name || currentUser.email).charAt(0).toUpperCase();
       }
     } else {
-      const meta = user.user_metadata;
-      document.getElementById('full-name').value = meta && meta.full_name ? meta.full_name : '';
-      document.getElementById('avatar-display').textContent = (meta && meta.full_name ? meta.full_name : user.email).charAt(0).toUpperCase();
-    }
-  }
-
-  document.getElementById('avatar-input').addEventListener('change', async function(e){
-    const file = e.target.files[0];
-    if(!file) return;
-    if(file.size > 2*1024*1024){ showMessage('Image must be under 3MB.','error'); return; }
-    const {data:{session}} = await _supabase.auth.getSession();
-    const path = 'avatars/' + session.user.id;
-    const {error} = await _supabase.storage.from('profiles').upload(path, file, {upsert:true});
-    if(error){ showMessage('Photo upload failed: '+error.message,'error'); return; }
-    const {data} = _supabase.storage.from('profiles').getPublicUrl(path);
-    await _supabase.from('profiles').upsert({id:session.user.id, avatar_url:data.publicUrl});
-    document.getElementById('avatar-display').innerHTML = '<img src="'+data.publicUrl+'" alt="Avatar">';
-    showMessage('Photo updated successfully.','success');
-  });
-
-  document.getElementById('profile-form').addEventListener('submit', async function(e){
-    e.preventDefault();
-    const {data:{session}} = await _supabase.auth.getSession();
-    if(!session){ window.location.href='auth.html'; return; }
-    const {error} = await _supabase.from('profiles').upsert({
-      id: session.user.id,
-      full_name: document.getElementById('full-name').value,
-      username: document.getElementById('username').value,
-      phone: document.getElementById('phone').value,
-      about_me: document.getElementById('about-me').value,
-      updated_at: new Date()
-    });
-    if(error){ showMessage('Error saving: '+error.message,'error'); }
-    else{
-  showMessage('Profile saved successfully.','success');
-  setTimeout(()=>{ window.location.href='dashboard.html'; }, 1500);
-}
-  });
-
-  const hamburger = document.querySelector('.hamburger');
-  const navLinks = document.querySelector('.nav-links');
-  if(hamburger){
-    hamburger.addEventListener('click', function(){ navLinks.classList.toggle('open'); });
-    document.addEventListener('click', function(e){
-      if(!hamburger.contains(e.target) && !navLinks.contains(e.target)){
-        navLinks.classList.remove('open');
+      var meta = currentUser.user_metadata;
+      if(meta && meta.full_name){
+        document.getElementById('full-name').value = meta.full_name;
+        document.getElementById('avatar-display').textContent = meta.full_name.charAt(0).toUpperCase();
+      } else {
+        document.getElementById('avatar-display').textContent = currentUser.email.charAt(0).toUpperCase();
       }
-    });
-  }
+    }
+  });
+}
 
-  loadProfile();
-});
+function saveProfile(){
+  if(!currentUser) return;
+  var profileData = {
+    id: currentUser.id,
+    full_name: document.getElementById('full-name').value,
+    username: document.getElementById('username').value,
+    phone: document.getElementById('phone').value,
+    about_me: document.getElementById('about-me').value,
+    updated_at: new Date().toISOString()
+  };
+  db.from('profiles').upsert(profileData).then(function(result){
+    if(result.error){
+      showMessage('Error: ' + result.error.message, 'error');
+    } else {
+      showMessage('Profile saved successfully.', 'success');
+      setTimeout(function(){ window.location.href = 'dashboard.html'; }, 2000);
+    }
+  });
+}
+
+function uploadAvatar(file){
+  if(!file) return;
+  if(file.size > 2 * 1024 * 1024){
+    showMessage('Image must be under 2MB.', 'error');
+    return;
+  }
+  var path = 'avatars/' + currentUser.id;
+  db.storage.from('profiles').upload(path, file, {upsert: true}).then(function(result){
+    if(result.error){
+      showMessage('Upload failed: ' + result.error.message, 'error');
+      return;
+    }
+    var urlResult = db.storage.from('profiles').getPublicUrl(path);
+    var publicUrl = urlResult.data.publicUrl;
+    db.from('profiles').upsert({
+      id: currentUser.id,
+      avatar_url: publicUrl,
+      updated_at: new Date().toISOString()
+    }).then(function(){
+      document.getElementById('avatar-display').innerHTML = '<img src="' + publicUrl + '" alt="Avatar">';
+      showMessage('Photo updated successfully.', 'success');
+    });
+  });
+}
+
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
+}
+</script>
+</body>
+</html>
