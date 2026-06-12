@@ -121,6 +121,7 @@ function initDashboard() {
     document.getElementById('dash-email').textContent = user.email || '—';
 
     db.from('profiles').select('*').eq('id', user.id).single().then(function(result) {
+        console.log("PROFILE RESULT:", result);
       var data = result.data;
       if (data) {
         var name = data.full_name || user.email;
