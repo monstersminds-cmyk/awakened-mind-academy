@@ -9,6 +9,7 @@
 <meta property="og:image" content="https://awakened-mind-academy-j5a2.vercel.app/images/AWAKENED_LOGO2.png">
 <meta property="og:title" content="Awakened Mind Academy">
 <meta property="og:description" content="Psychology-based coaching for discipline, clarity, and mental transformation.">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -25,7 +26,25 @@
     <span></span><span></span><span></span>
   </button>
 </nav>
+<div class="locked-section" style="display:none;">
+  <div class="page-hero">
+    <div class="page-hero-content">
+      <p class="hero-eyebrow">Our Services</p>
+      <h1>Four paths to mental transformation.</h1>
+      <p>Log in to explore the full details of each coaching program and get started.</p>
+    </div>
+  </div>
+  <section style="background:var(--bg);text-align:center;padding:4rem 5%;">
+    <div style="max-width:500px;margin:0 auto;">
+      <p class="section-eyebrow">Members Only</p>
+      <h2 class="section-title">This page is locked</h2>
+      <p style="color:var(--text-dim);margin-bottom:2rem;">Create a free account or log in to access the full Services page and your personal dashboard.</p>
+      <a href="../auth.html" class="btn btn-gold">Login / Register Free</a>
+    </div>
+  </section>
+</div>
 
+<div class="protected-content">
 <div class="page-hero">
   <div class="page-hero-content">
     <p class="hero-eyebrow">Our Services</p>
@@ -99,6 +118,12 @@
   <div class="footer-bottom">© 2026 Awakened Mind Academy. All rights reserved.</div>
 </footer>
 
-<script src="../js/main.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', async()=>{
+    const session = await requireAuth();
+  });
+  </script>
+  <script src="../js/main.js"></script>
+</div>
 </body>
 </html>
