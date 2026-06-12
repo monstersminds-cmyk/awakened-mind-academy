@@ -6,7 +6,7 @@
   <title>My Profile — Awakened Mind Academy</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="icon" type="image/png" href="images/AWAKENED_LOGO2.png">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <style>
     .profile-container{min-height:100vh;padding:7rem 5% 4rem;max-width:700px;margin:0 auto}
     .profile-header{margin-bottom:2.5rem}
@@ -83,23 +83,28 @@
 <script>
 var SUPA_URL = 'https://ffpppcbegvjskeujlqif.supabase.co';
 var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZmcHBwY2JlZ3Zqc2tldWpscWlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExODM3MTQsImV4cCI6MjA5Njc1OTcxNH0.FZu3uNtxJ8KeYx-c2d79YC3ThKzC98W4Azaxzsoot2A';
-var db;
-var currentUser;
+var db = null;
+var currentUser = null;
 
-function showMessage(text, type){
+function showMessage(text, type) {
   var msg = document.getElementById('profile-message');
   msg.textContent = text;
   msg.className = 'profile-message ' + type;
   msg.style.display = 'block';
-  setTimeout(function(){ msg.style.display = 'none'; }, 5000);
+  setTimeout(function() { msg.style.display = 'none'; }, 5000);
 }
 
-function initApp(){
-  db = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+function initApp() {
+  try {
+    db = supabase.createClient(SUPA_URL, SUPA_KEY);
+  } catch(e) {
+    setTimeout(initApp, 500);
+    return;
+  }
 
-  db.auth.getSession().then(function(result){
+  db.auth.getSession().then(function(result) {
     var session = result.data.session;
-    if(!session){
+    if (!session) {
       window.location.href = 'auth.html';
       return;
     }
@@ -108,45 +113,48 @@ function initApp(){
     loadProfile();
   });
 
-  document.getElementById('logout-btn').addEventListener('click', function(){
-    db.auth.signOut().then(function(){
+  document.getElementById('logout-btn').addEventListener('click', function() {
+    db.auth.signOut().then(function() {
       window.location.href = 'auth.html';
     });
   });
 
-  document.getElementById('save-btn').addEventListener('click', function(){
+  document.getElementById('save-btn').addEventListener('click', function() {
     saveProfile();
   });
 
-  document.getElementById('avatar-input').addEventListener('change', function(e){
-    uploadAvatar(e.target.files[0]);
+  document.getElementById('avatar-input').addEventListener('change', function(e) {
+    if (e.target.files && e.target.files[0]) {
+      uploadAvatar(e.target.files[0]);
+    }
   });
 
   var hamburger = document.querySelector('.hamburger');
   var navLinks = document.querySelector('.nav-links');
-  if(hamburger){
-    hamburger.addEventListener('click', function(){
+  if (hamburger) {
+    hamburger.addEventListener('click', function() {
       navLinks.classList.toggle('open');
     });
   }
 }
 
-function loadProfile(){
-  db.from('profiles').select('*').eq('id', currentUser.id).single().then(function(result){
+function loadProfile() {
+  db.from('profiles').select('*').eq('id', currentUser.id).single().then(function(result) {
     var data = result.data;
-    if(data){
+    if (data) {
       document.getElementById('full-name').value = data.full_name || '';
       document.getElementById('username').value = data.username || '';
       document.getElementById('phone').value = data.phone || '';
       document.getElementById('about-me').value = data.about_me || '';
-      if(data.avatar_url){
+      if (data.avatar_url) {
         document.getElementById('avatar-display').innerHTML = '<img src="' + data.avatar_url + '" alt="Avatar">';
       } else {
-        document.getElementById('avatar-display').textContent = (data.full_name || currentUser.email).charAt(0).toUpperCase();
+        var initial = (data.full_name || currentUser.email).charAt(0).toUpperCase();
+        document.getElementById('avatar-display').textContent = initial;
       }
     } else {
       var meta = currentUser.user_metadata;
-      if(meta && meta.full_name){
+      if (meta && meta.full_name) {
         document.getElementById('full-name').value = meta.full_name;
         document.getElementById('avatar-display').textContent = meta.full_name.charAt(0).toUpperCase();
       } else {
@@ -156,35 +164,41 @@ function loadProfile(){
   });
 }
 
-function saveProfile(){
-  if(!currentUser) return;
-  var profileData = {
+function saveProfile() {
+  if (!currentUser) return;
+  var fullName = document.getElementById('full-name').value;
+  var username = document.getElementById('username').value;
+  var phone = document.getElementById('phone').value;
+  var aboutMe = document.getElementById('about-me').value;
+
+  db.from('profiles').upsert({
     id: currentUser.id,
-    full_name: document.getElementById('full-name').value,
-    username: document.getElementById('username').value,
-    phone: document.getElementById('phone').value,
-    about_me: document.getElementById('about-me').value,
+    full_name: fullName,
+    username: username,
+    phone: phone,
+    about_me: aboutMe,
     updated_at: new Date().toISOString()
-  };
-  db.from('profiles').upsert(profileData).then(function(result){
-    if(result.error){
-      showMessage('Error: ' + result.error.message, 'error');
+  }).then(function(result) {
+    if (result.error) {
+      showMessage('Error saving: ' + result.error.message, 'error');
     } else {
       showMessage('Profile saved successfully.', 'success');
-      setTimeout(function(){ window.location.href = 'dashboard.html'; }, 2000);
+      setTimeout(function() {
+        window.location.href = 'dashboard.html';
+      }, 2000);
     }
   });
 }
 
-function uploadAvatar(file){
-  if(!file) return;
-  if(file.size > 2 * 1024 * 1024){
+function uploadAvatar(file) {
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) {
     showMessage('Image must be under 2MB.', 'error');
     return;
   }
   var path = 'avatars/' + currentUser.id;
-  db.storage.from('profiles').upload(path, file, {upsert: true}).then(function(result){
-    if(result.error){
+  db.storage.from('profiles').upload(path, file, { upsert: true }).then(function(result) {
+    if (result.error) {
       showMessage('Upload failed: ' + result.error.message, 'error');
       return;
     }
@@ -194,14 +208,14 @@ function uploadAvatar(file){
       id: currentUser.id,
       avatar_url: publicUrl,
       updated_at: new Date().toISOString()
-    }).then(function(){
+    }).then(function() {
       document.getElementById('avatar-display').innerHTML = '<img src="' + publicUrl + '" alt="Avatar">';
       showMessage('Photo updated successfully.', 'success');
     });
   });
 }
 
-if(document.readyState === 'loading'){
+if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initApp);
 } else {
   initApp();
