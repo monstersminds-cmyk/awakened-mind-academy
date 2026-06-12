@@ -35,7 +35,7 @@
     <h1>Stop Drifting.<br><em>Start Executing.</em></h1>
     <p>Awakened Mind Academy uses behavioral psychology and nervous system science to help you replace mental scattering with discipline, clarity, and a clear direction forward.</p>
     <div class="hero-cta">
-      <a href="auth.html" class="btn btn-gold">Get Started</a>
+      <a href="auth.html" class="btn btn-gold" id="nav-cta">Get Started</a>
       <a href="pages/services.html" class="btn btn-outline">Explore Services</a>
     </div>
   </div>
@@ -276,7 +276,25 @@
   </div>
   <div class="footer-bottom">© 2026 Awakened Mind Academy. All rights reserved.</div>
 </footer>
-
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/main.js"></script>
+<script>
+  (function(){
+    try {
+      var db = supabase.createClient(
+        'https://ffpppcbegvjskeujlqif.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZmcHBwY2JlZ3Zqc2tldWpscWlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExODM3MTQsImV4cCI6MjA5Njc1OTcxNH0.FZu3uNtxJ8KeYx-c2d79YC3ThKzC98W4Azaxzsoot2A'
+      );
+      db.auth.getSession().then(function(result){
+        var session = result.data.session;
+        var btn = document.getElementById('nav-cta');
+        if(session && btn){
+          btn.textContent = 'Dashboard';
+          btn.href = 'dashboard.html';
+        }
+      });
+    } catch(e) {}
+  })();
+  </script>
 </body>
 </html>

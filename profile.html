@@ -276,11 +276,17 @@ function uploadAvatar(file) {
   });
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initPage);
-} else {
-  initPage();
-}
-</script>
-</body>
-</html>
+window.addEventListener('load', function() {
+  var attempts = 0;
+  var interval = setInterval(function() {
+    attempts++;
+    if (typeof supabase !== 'undefined') {
+      clearInterval(interval);
+      initPage();
+    }
+    if (attempts > 20) {
+      clearInterval(interval);
+      document.getElementById('gate-section').innerHTML = '<p style="color:var(--text-dim);text-align:center;">Failed to load. Please <a href="profile.html" style="color:var(--gold);">refresh the page</a>.</p>';
+    }
+  }, 300);
+});
