@@ -51,9 +51,7 @@
       <div class="profile-detail">Phone: <span id="dash-phone">—</span></div>
     </div>
     <div class="profile-card-actions">
-        <button id="update-profile-btn" class="btn btn-outline" style="font-size:0.82rem;padding:0.5rem 1.3rem;white-space:nowrap;">
-            Update Profile
-          </button>
+      <a href="profile.html" class="btn btn-outline" style="font-size:0.82rem;padding:0.5rem 1.3rem;white-space:nowrap;">Update Profile</a>
       <button id="logout-btn2" class="btn btn-gold" style="font-size:0.82rem;padding:0.5rem 1.3rem;">Logout</button>
     </div>
   </div>
@@ -99,34 +97,7 @@
     </a>
   </div>
 </div>
-<!-- UPDATE PROFILE MODAL -->
-<div id="profile-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:9999;align-items:center;justify-content:center;padding:1rem;">
-    <div style="background:var(--bg2);border:1px solid rgba(201,168,76,0.2);border-radius:var(--radius);padding:2rem;width:100%;max-width:500px;">
-      
-      <h2 style="margin-bottom:1.5rem;">Update Profile</h2>
-  
-      <div class="form-group">
-        <label>Full Name</label>
-        <input type="text" id="edit-name">
-      </div>
-  
-      <div class="form-group">
-        <label>Username</label>
-        <input type="text" id="edit-username">
-      </div>
-  
-      <div class="form-group">
-        <label>Phone Number</label>
-        <input type="text" id="edit-phone">
-      </div>
-  
-      <div style="display:flex;gap:1rem;margin-top:1.5rem;">
-        <button id="save-profile-btn" class="btn btn-gold">Save Changes</button>
-        <button id="close-profile-btn" class="btn btn-outline">Cancel</button>
-      </div>
-  
-    </div>
-  </div>
+
 <script>
 var SUPA_URL = 'https://ffpppcbegvjskeujlqif.supabase.co';
 var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZmcHBwY2JlZ3Zqc2tldWpscWlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExODM3MTQsImV4cCI6MjA5Njc1OTcxNH0.FZu3uNtxJ8KeYx-c2d79YC3ThKzC98W4Azaxzsoot2A';
@@ -150,7 +121,6 @@ function initDashboard() {
     document.getElementById('dash-email').textContent = user.email || '—';
 
     db.from('profiles').select('*').eq('id', user.id).single().then(function(result) {
-        console.log("PROFILE RESULT:", result);
       var data = result.data;
       if (data) {
         var name = data.full_name || user.email;
