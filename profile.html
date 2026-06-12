@@ -6,7 +6,6 @@
   <title>Update Profile — Awakened Mind Academy</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="icon" type="image/png" href="images/AWAKENED_LOGO2.png">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <style>
     .profile-container{min-height:100vh;padding:7rem 5% 4rem;max-width:700px;margin:0 auto}
     .profile-header{margin-bottom:2.5rem}
@@ -25,6 +24,8 @@
     .gate-box h2{font-size:1.3rem;margin-bottom:0.5rem;color:var(--gold)}
     .gate-box p{color:var(--text-dim);font-size:0.9rem;margin-bottom:1.5rem}
     .gate-box .form-group{text-align:left;margin-bottom:1rem}
+    .gate-input{width:100%;background:var(--bg);border:1px solid rgba(201,168,76,0.2);border-radius:var(--radius);padding:0.75rem 1rem;color:var(--text);font-family:Inter,sans-serif;font-size:0.9rem;outline:none;box-sizing:border-box}
+    .gate-input:focus{border-color:var(--gold)}
     .hidden{display:none}
   </style>
 </head>
@@ -47,26 +48,24 @@
     <h1 class="section-title">Update Profile</h1>
   </div>
 
-  <!-- PASSWORD GATE -->
   <div id="gate-section">
     <div class="gate-box">
       <h2>Verify Your Identity</h2>
       <p>Enter your password to access and update your profile details.</p>
       <div id="gate-message" class="profile-message"></div>
       <div class="form-group">
-        <label>Email</label>
-        <input type="email" id="gate-email" disabled style="opacity:0.6;cursor:not-allowed;width:100%;background:var(--bg);border:1px solid rgba(201,168,76,0.2);border-radius:var(--radius);padding:0.75rem 1rem;color:var(--text);font-family:Inter,sans-serif;font-size:0.9rem;">
+        <label style="font-size:0.78rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-dim);display:block;margin-bottom:0.4rem;">Email</label>
+        <input type="email" id="gate-email" class="gate-input" disabled style="opacity:0.6;cursor:not-allowed;">
       </div>
       <div class="form-group">
-        <label>Password</label>
-        <input type="password" id="gate-password" placeholder="Enter your password" style="width:100%;background:var(--bg);border:1px solid rgba(201,168,76,0.2);border-radius:var(--radius);padding:0.75rem 1rem;color:var(--text);font-family:Inter,sans-serif;font-size:0.9rem;outline:none;">
+        <label style="font-size:0.78rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-dim);display:block;margin-bottom:0.4rem;">Password</label>
+        <input type="password" id="gate-password" class="gate-input" placeholder="Enter your password">
       </div>
-      <button id="gate-btn" class="btn btn-gold" style="width:100%;margin-top:0.5rem;">Verify & Edit Profile</button>
+      <button id="gate-btn" class="btn btn-gold" style="width:100%;margin-top:0.5rem;">Verify &amp; Edit Profile</button>
       <p style="margin-top:1rem;font-size:0.82rem;"><a href="dashboard.html" style="color:var(--gold);">← Back to Dashboard</a></p>
     </div>
   </div>
 
-  <!-- PROFILE EDIT FORM (hidden until password verified) -->
   <div id="profile-section" class="hidden">
     <div class="profile-avatar-section">
       <div class="profile-avatar" id="avatar-display">?</div>
@@ -109,33 +108,27 @@
 </div>
 
 <script>
-var SUPA_URL = 'https://ffpppcbegvjskeujlqif.supabase.co';
-var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZmcHBwY2JlZ3Zqc2tldWpscWlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExODM3MTQsImV4cCI6MjA5Njc1OTcxNH0.FZu3uNtxJ8KeYx-c2d79YC3ThKzC98W4Azaxzsoot2A';
-var db = null;
-var currentUser = null;
+(function() {
+  var SUPA_URL = 'https://ffpppcbegvjskeujlqif.supabase.co';
+  var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZmcHBwY2JlZ3Zqc2tldWpscWlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExODM3MTQsImV4cCI6MjA5Njc1OTcxNH0.FZu3uNtxJ8KeYx-c2d79YC3ThKzC98W4Azaxzsoot2A';
 
-function showGateMessage(text, type) {
-  var msg = document.getElementById('gate-message');
-  msg.textContent = text;
-  msg.className = 'profile-message ' + type;
-  msg.style.display = 'block';
-}
-
-function showProfileMessage(text, type) {
-  var msg = document.getElementById('profile-message');
-  msg.textContent = text;
-  msg.className = 'profile-message ' + type;
-  msg.style.display = 'block';
-  setTimeout(function() { msg.style.display = 'none'; }, 5000);
-}
-
-function initPage() {
-  try {
-    db = supabase.createClient(SUPA_URL, SUPA_KEY);
-  } catch(e) {
-    setTimeout(initPage, 500);
-    return;
+  function showGateMessage(text, type) {
+    var msg = document.getElementById('gate-message');
+    msg.textContent = text;
+    msg.className = 'profile-message ' + type;
+    msg.style.display = 'block';
   }
+
+  function showProfileMessage(text, type) {
+    var msg = document.getElementById('profile-message');
+    msg.textContent = text;
+    msg.className = 'profile-message ' + type;
+    msg.style.display = 'block';
+    setTimeout(function() { msg.style.display = 'none'; }, 5000);
+  }
+
+  var db = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+  var currentUser = null;
 
   db.auth.getSession().then(function(result) {
     var session = result.data.session;
@@ -148,12 +141,12 @@ function initPage() {
   });
 
   document.getElementById('gate-btn').addEventListener('click', function() {
-    var password = document.getElementById('gate-password').value;
+    var password = document.getElementById('gate-password').value.trim();
     if (!password) {
       showGateMessage('Please enter your password.', 'error');
       return;
     }
-    var btn = document.getElementById('gate-btn');
+    var btn = this;
     btn.textContent = 'Verifying...';
     btn.disabled = true;
 
@@ -166,9 +159,8 @@ function initPage() {
         setTimeout(function() { window.location.href = 'auth.html'; }, 2000);
         return;
       }
-      var email = session.user.email;
       db.auth.signInWithPassword({
-        email: email,
+        email: session.user.email,
         password: password
       }).then(function(result) {
         btn.textContent = 'Verify & Edit Profile';
@@ -186,118 +178,80 @@ function initPage() {
   });
 
   document.getElementById('gate-password').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') {
-      document.getElementById('gate-btn').click();
-    }
+    if (e.key === 'Enter') { document.getElementById('gate-btn').click(); }
   });
 
   document.getElementById('logout-btn').addEventListener('click', function() {
-    db.auth.signOut().then(function() {
-      window.location.href = 'auth.html';
-    });
+    db.auth.signOut().then(function() { window.location.href = 'auth.html'; });
   });
 
-  document.getElementById('save-btn').addEventListener('click', function() {
-    saveProfile();
-  });
+  document.getElementById('save-btn').addEventListener('click', function() { saveProfile(); });
 
   document.getElementById('avatar-input').addEventListener('change', function(e) {
-    if (e.target.files && e.target.files[0]) {
-      uploadAvatar(e.target.files[0]);
-    }
+    if (e.target.files && e.target.files[0]) { uploadAvatar(e.target.files[0]); }
   });
 
   var hamburger = document.querySelector('.hamburger');
   var navLinks = document.querySelector('.nav-links');
   if (hamburger) {
-    hamburger.addEventListener('click', function() {
-      navLinks.classList.toggle('open');
+    hamburger.addEventListener('click', function() { navLinks.classList.toggle('open'); });
+  }
+
+  function loadProfile() {
+    document.getElementById('email').value = currentUser.email;
+    db.from('profiles').select('*').eq('id', currentUser.id).single().then(function(result) {
+      var data = result.data;
+      if (data) {
+        document.getElementById('full-name').value = data.full_name || '';
+        document.getElementById('username').value = data.username || '';
+        document.getElementById('phone').value = data.phone || '';
+        document.getElementById('about-me').value = data.about_me || '';
+        if (data.avatar_url) {
+          document.getElementById('avatar-display').innerHTML = '<img src="' + data.avatar_url + '" alt="Avatar">';
+        } else {
+          document.getElementById('avatar-display').textContent = (data.full_name || currentUser.email).charAt(0).toUpperCase();
+        }
+      } else {
+        var meta = currentUser.user_metadata;
+        document.getElementById('full-name').value = (meta && meta.full_name) ? meta.full_name : '';
+        document.getElementById('avatar-display').textContent = ((meta && meta.full_name) ? meta.full_name : currentUser.email).charAt(0).toUpperCase();
+      }
     });
   }
-}
 
-function loadProfile() {
-  document.getElementById('email').value = currentUser.email;
-  db.from('profiles').select('*').eq('id', currentUser.id).single().then(function(result) {
-    var data = result.data;
-    if (data) {
-      document.getElementById('full-name').value = data.full_name || '';
-      document.getElementById('username').value = data.username || '';
-      document.getElementById('phone').value = data.phone || '';
-      document.getElementById('about-me').value = data.about_me || '';
-      if (data.avatar_url) {
-        document.getElementById('avatar-display').innerHTML = '<img src="' + data.avatar_url + '" alt="Avatar">';
-      } else {
-        document.getElementById('avatar-display').textContent = (data.full_name || currentUser.email).charAt(0).toUpperCase();
-      }
-    } else {
-      var meta = currentUser.user_metadata;
-      if (meta && meta.full_name) {
-        document.getElementById('full-name').value = meta.full_name;
-        document.getElementById('avatar-display').textContent = meta.full_name.charAt(0).toUpperCase();
-      } else {
-        document.getElementById('avatar-display').textContent = currentUser.email.charAt(0).toUpperCase();
-      }
-    }
-  });
-}
-
-function saveProfile() {
-  if (!currentUser) return;
-  db.from('profiles').upsert({
-    id: currentUser.id,
-    full_name: document.getElementById('full-name').value,
-    username: document.getElementById('username').value,
-    phone: document.getElementById('phone').value,
-    about_me: document.getElementById('about-me').value,
-    updated_at: new Date().toISOString()
-  }).then(function(result) {
-    if (result.error) {
-      showProfileMessage('Error saving: ' + result.error.message, 'error');
-    } else {
-      showProfileMessage('Profile updated successfully.', 'success');
-      setTimeout(function() {
-        window.location.href = 'dashboard.html';
-      }, 2000);
-    }
-  });
-}
-
-function uploadAvatar(file) {
-  if (!file) return;
-  if (file.size > 2 * 1024 * 1024) {
-    showProfileMessage('Image must be under 2MB.', 'error');
-    return;
-  }
-  var path = 'avatars/' + currentUser.id;
-  db.storage.from('profiles').upload(path, file, { upsert: true }).then(function(result) {
-    if (result.error) {
-      showProfileMessage('Upload failed: ' + result.error.message, 'error');
-      return;
-    }
-    var urlResult = db.storage.from('profiles').getPublicUrl(path);
-    var publicUrl = urlResult.data.publicUrl;
+  function saveProfile() {
+    if (!currentUser) return;
     db.from('profiles').upsert({
       id: currentUser.id,
-      avatar_url: publicUrl,
+      full_name: document.getElementById('full-name').value,
+      username: document.getElementById('username').value,
+      phone: document.getElementById('phone').value,
+      about_me: document.getElementById('about-me').value,
       updated_at: new Date().toISOString()
-    }).then(function() {
-      document.getElementById('avatar-display').innerHTML = '<img src="' + publicUrl + '" alt="Avatar">';
-      showProfileMessage('Photo updated successfully.', 'success');
+    }).then(function(result) {
+      if (result.error) {
+        showProfileMessage('Error saving: ' + result.error.message, 'error');
+      } else {
+        showProfileMessage('Profile updated successfully.', 'success');
+        setTimeout(function() { window.location.href = 'dashboard.html'; }, 2000);
+      }
     });
-  });
-}
-document.addEventListener('DOMContentLoaded', function() {
-  var attempts = 0;
-  function tryInit() {
-    attempts++;
-    if (typeof supabase !== 'undefined' && supabase.createClient) {
-      initPage();
-    } else if (attempts < 30) {
-      setTimeout(tryInit, 200);
-    } else {
-      document.getElementById('gate-section').innerHTML = '<div class="gate-box"><p style="color:var(--text-dim);">Page failed to load. Please check your internet and <a href="profile.html" style="color:var(--gold);">refresh</a>.</p></div>';
-    }
   }
-  tryInit();
-});
+
+  function uploadAvatar(file) {
+    if (file.size > 2 * 1024 * 1024) { showProfileMessage('Image must be under 2MB.', 'error'); return; }
+    var path = 'avatars/' + currentUser.id;
+    db.storage.from('profiles').upload(path, file, { upsert: true }).then(function(result) {
+      if (result.error) { showProfileMessage('Upload failed: ' + result.error.message, 'error'); return; }
+      var publicUrl = db.storage.from('profiles').getPublicUrl(path).data.publicUrl;
+      db.from('profiles').upsert({ id: currentUser.id, avatar_url: publicUrl, updated_at: new Date().toISOString() }).then(function() {
+        document.getElementById('avatar-display').innerHTML = '<img src="' + publicUrl + '" alt="Avatar">';
+        showProfileMessage('Photo updated successfully.', 'success');
+      });
+    });
+  }
+
+})();
+</script>
+</body>
+</html>
