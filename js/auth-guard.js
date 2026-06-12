@@ -15,7 +15,7 @@ async function initNav(){
       <a href="/pages/services.html">Services</a>
       <a href="/pages/contact.html">Contact</a>
       <a href="/dashboard.html">Dashboard</a>
-      <a href="/profile.html">👤 ${name}</a>
+    <span style="color:var(--gold);font-weight:600;">👤 ${name}</span>
       <button onclick="logoutUser()" class="btn btn-outline" style="font-size:0.8rem;padding:0.5rem 1.2rem;">Logout</button>
     `;
   } else {
