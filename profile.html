@@ -10,8 +10,8 @@
     .profile-container{min-height:100vh;padding:7rem 5% 4rem;max-width:700px;margin:0 auto}
     .profile-header{margin-bottom:2.5rem}
     .profile-avatar-section{display:flex;align-items:center;gap:1.5rem;margin-bottom:2.5rem;flex-wrap:wrap}
-    .profile-avatar{width:100px;height:100px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:2.5rem;font-weight:700;color:var(--gold);flex-shrink:0}
-    .profile-avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+    .profile-avatar{width:100px;height:100px;border-radius:50%;border:2px solid var(--gold);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:2.5rem;font-weight:700;color:var(--gold);flex-shrink:0;overflow:hidden}
+    .profile-avatar img{width:100%;height:100%;object-fit:cover}
     .avatar-upload label{display:inline-block;cursor:pointer;color:var(--gold);font-size:0.85rem;border:1px solid var(--gold);padding:0.4rem 1rem;border-radius:var(--radius);transition:background 0.2s}
     .avatar-upload label:hover{background:rgba(201,168,76,0.1)}
     .avatar-upload input{display:none}
@@ -23,6 +23,7 @@
   </style>
 </head>
 <body>
+
 <nav>
   <a href="index.html" class="nav-logo">Awakened Mind Academy</a>
   <div class="nav-links">
@@ -75,8 +76,10 @@
       <textarea id="about-me" placeholder="Tell Professor Kungu a little about yourself and your goals..." style="min-height:90px;"></textarea>
     </div>
     <button type="submit" class="btn btn-gold" style="width:100%;">Save Profile</button>
+  </form>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const _supabase = window.supabase.createClient(
   'https://ffpppcbegvjskeujlqif.supabase.co',
@@ -86,62 +89,59 @@ const _supabase = window.supabase.createClient(
 function showMessage(text, type){
   const msg = document.getElementById('profile-message');
   msg.textContent = text;
-  msg.className = `profile-message ${type}`;
+  msg.className = 'profile-message ' + type;
   msg.style.display = 'block';
-  setTimeout(()=>msg.style.display='none', 4000);
+  setTimeout(()=>{ msg.style.display='none'; }, 4000);
+}
+
+async function logoutUser(){
+  await _supabase.auth.signOut();
+  window.location.href = 'auth.html';
 }
 
 async function loadProfile(){
   const {data:{session}} = await _supabase.auth.getSession();
   if(!session){ window.location.href='auth.html'; return; }
-
   const user = session.user;
   document.getElementById('email').value = user.email;
-
-  const {data} = await _supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single();
-
+  const {data} = await _supabase.from('profiles').select('*').eq('id', user.id).single();
   if(data){
     document.getElementById('full-name').value = data.full_name || '';
     document.getElementById('username').value = data.username || '';
     document.getElementById('phone').value = data.phone || '';
     document.getElementById('about-me').value = data.about_me || '';
     if(data.avatar_url){
-      document.getElementById('avatar-display').innerHTML = `<img src="${data.avatar_url}" alt="Avatar">`;
+      document.getElementById('avatar-display').innerHTML = '<img src="'+data.avatar_url+'" alt="Avatar">';
     } else {
       const initials = (data.full_name || user.email).charAt(0).toUpperCase();
       document.getElementById('avatar-display').textContent = initials;
     }
   } else {
     const meta = user.user_metadata;
-    document.getElementById('full-name').value = meta?.full_name || '';
-    const initials = (meta?.full_name || user.email).charAt(0).toUpperCase();
+    document.getElementById('full-name').value = meta && meta.full_name ? meta.full_name : '';
+    const initials = (meta && meta.full_name ? meta.full_name : user.email).charAt(0).toUpperCase();
     document.getElementById('avatar-display').textContent = initials;
   }
 }
 
-document.getElementById('avatar-input').addEventListener('change', async(e)=>{
+document.getElementById('avatar-input').addEventListener('change', async function(e){
   const file = e.target.files[0];
   if(!file) return;
   if(file.size > 2*1024*1024){ showMessage('Image must be under 2MB.','error'); return; }
   const {data:{session}} = await _supabase.auth.getSession();
-  const path = `avatars/${session.user.id}`;
+  const path = 'avatars/' + session.user.id;
   const {error} = await _supabase.storage.from('profiles').upload(path, file, {upsert:true});
   if(error){ showMessage('Photo upload failed: '+error.message,'error'); return; }
-  const {data:{publicUrl}} = _supabase.storage.from('profiles').getPublicUrl(path);
-  await _supabase.from('profiles').upsert({id:session.user.id, avatar_url:publicUrl});
-  document.getElementById('avatar-display').innerHTML = `<img src="${publicUrl}" alt="Avatar">`;
-  showMessage('Photo updated.','success');
+  const {data} = _supabase.storage.from('profiles').getPublicUrl(path);
+  await _supabase.from('profiles').upsert({id:session.user.id, avatar_url:data.publicUrl});
+  document.getElementById('avatar-display').innerHTML = '<img src="'+data.publicUrl+'" alt="Avatar">';
+  showMessage('Photo updated successfully.','success');
 });
 
-document.getElementById('profile-form').addEventListener('submit', async(e)=>{
+document.getElementById('profile-form').addEventListener('submit', async function(e){
   e.preventDefault();
   const {data:{session}} = await _supabase.auth.getSession();
   if(!session){ window.location.href='auth.html'; return; }
-
   const {error} = await _supabase.from('profiles').upsert({
     id: session.user.id,
     full_name: document.getElementById('full-name').value,
@@ -150,13 +150,22 @@ document.getElementById('profile-form').addEventListener('submit', async(e)=>{
     about_me: document.getElementById('about-me').value,
     updated_at: new Date()
   });
-
-  if(error) showMessage('Error saving profile: '+error.message,'error');
-  else showMessage('Profile saved successfully.','success');
+  if(error){ showMessage('Error saving: '+error.message,'error'); }
+  else{ showMessage('Profile saved successfully.','success'); }
 });
 
 loadProfile();
+
+const hamburger = document.querySelector('.hamburger');
+const navLinks = document.querySelector('.nav-links');
+if(hamburger){
+  hamburger.addEventListener('click', function(){ navLinks.classList.toggle('open'); });
+  document.addEventListener('click', function(e){
+    if(!hamburger.contains(e.target) && !navLinks.contains(e.target)){
+      navLinks.classList.remove('open');
+    }
+  });
+}
 </script>
-<script src="js/main.js"></script>
 </body>
 </html>
