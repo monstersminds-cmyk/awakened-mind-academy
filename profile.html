@@ -6,7 +6,6 @@
   <title>My Profile — Awakened Mind Academy</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="icon" type="image/png" href="images/AWAKENED_LOGO2.png">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     .profile-container{min-height:100vh;padding:7rem 5% 4rem;max-width:700px;margin:0 auto}
     .profile-header{margin-bottom:2.5rem}
@@ -80,7 +79,7 @@
 </div>
 
 <script>
-const supabase = window.supabase.createClient(
+const _supabase = window.supabase.createClient(
   'https://ffpppcbegvjskeujlqif.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZmcHBwY2JlZ3Zqc2tldWpscWlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExODM3MTQsImV4cCI6MjA5Njc1OTcxNH0.FZu3uNtxJ8KeYx-c2d79YC3ThKzC98W4Azaxzsoot2A'
 );
@@ -94,13 +93,13 @@ function showMessage(text, type){
 }
 
 async function loadProfile(){
-  const {data:{session}} = await supabase.auth.getSession();
+  const {data:{session}} = await _supabase.auth.getSession();
   if(!session){ window.location.href='auth.html'; return; }
 
   const user = session.user;
   document.getElementById('email').value = user.email;
 
-  const {data} = await supabase
+  const {data} = await _supabase
     .from('profiles')
     .select('*')
     .eq('id', user.id)
@@ -129,22 +128,22 @@ document.getElementById('avatar-input').addEventListener('change', async(e)=>{
   const file = e.target.files[0];
   if(!file) return;
   if(file.size > 2*1024*1024){ showMessage('Image must be under 2MB.','error'); return; }
-  const {data:{session}} = await supabase.auth.getSession();
+  const {data:{session}} = await _supabase.auth.getSession();
   const path = `avatars/${session.user.id}`;
-  const {error} = await supabase.storage.from('profiles').upload(path, file, {upsert:true});
+  const {error} = await _supabase.storage.from('profiles').upload(path, file, {upsert:true});
   if(error){ showMessage('Photo upload failed: '+error.message,'error'); return; }
   const {data:{publicUrl}} = supabase.storage.from('profiles').getPublicUrl(path);
-  await supabase.from('profiles').upsert({id:session.user.id, avatar_url:publicUrl});
+  await _supabase.from('profiles').upsert({id:session.user.id, avatar_url:publicUrl});
   document.getElementById('avatar-display').innerHTML = `<img src="${publicUrl}" alt="Avatar">`;
   showMessage('Photo updated.','success');
 });
 
 document.getElementById('profile-form').addEventListener('submit', async(e)=>{
   e.preventDefault();
-  const {data:{session}} = await supabase.auth.getSession();
+  const {data:{session}} = await _supabase.auth.getSession();
   if(!session){ window.location.href='auth.html'; return; }
 
-  const {error} = await supabase.from('profiles').upsert({
+  const {error} = await _supabase.from('profiles').upsert({
     id: session.user.id,
     full_name: document.getElementById('full-name').value,
     username: document.getElementById('username').value,
