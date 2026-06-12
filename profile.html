@@ -6,7 +6,7 @@
   <title>Update Profile — Awakened Mind Academy</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="icon" type="image/png" href="images/AWAKENED_LOGO2.png">
-  <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <style>
     .profile-container{min-height:100vh;padding:7rem 5% 4rem;max-width:700px;margin:0 auto}
     .profile-header{margin-bottom:2.5rem}
@@ -275,18 +275,17 @@ function uploadAvatar(file) {
     });
   });
 }
-
-window.addEventListener('load', function() {
+document.addEventListener('DOMContentLoaded', function() {
   var attempts = 0;
-  var interval = setInterval(function() {
+  function tryInit() {
     attempts++;
-    if (typeof supabase !== 'undefined') {
-      clearInterval(interval);
+    if (typeof supabase !== 'undefined' && supabase.createClient) {
       initPage();
+    } else if (attempts < 30) {
+      setTimeout(tryInit, 200);
+    } else {
+      document.getElementById('gate-section').innerHTML = '<div class="gate-box"><p style="color:var(--text-dim);">Page failed to load. Please check your internet and <a href="profile.html" style="color:var(--gold);">refresh</a>.</p></div>';
     }
-    if (attempts > 20) {
-      clearInterval(interval);
-      document.getElementById('gate-section').innerHTML = '<p style="color:var(--text-dim);text-align:center;">Failed to load. Please <a href="profile.html" style="color:var(--gold);">refresh the page</a>.</p>';
-    }
-  }, 300);
+  }
+  tryInit();
 });
