@@ -30,3 +30,19 @@ db.auth.getSession().then(function(result) {
 
   if (session) 
     // Logged in — show Dashboard link + Profile button, no Get Started
+
+var dashLink = document.createElement('a');
+dashLink.href = root + 'dashboard.html';
+
+var profileBtn = document.createElement('a');
+profileBtn.href = root + 'profile.html';
+profileBtn.className = 'btn nav-auth-btn';
+profileBtn.style.cssText = 'font-size:0.8rem;padding:0.5rem 1.2rem;';
+
+var logoutBtn = nav.querySelector('#logout-btn');
+if (logoutBtn) {
+  nav.insertBefore(dashLink, logoutBtn);
+} else {
+  nav.appendChild(dashLink);
+}
+nav.appendChild(profileBtn);
