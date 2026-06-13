@@ -37,18 +37,14 @@ el.remove();
 
 if (session) {
 
-```
-var isHome =
-  window.location.pathname.endsWith('index.html') ||
-  window.location.pathname === '/' ||
-  window.location.pathname === '';
+  if (!nav.querySelector('a[href*="dashboard.html"]')) {
+    var dashboardBtn = document.createElement('a');
+    dashboardBtn.href = root + 'dashboard.html';
+    dashboardBtn.className = 'btn btn-gold nav-auth-btn';
+    dashboardBtn.textContent = 'Dashboard';
+    nav.appendChild(dashboardBtn);
+  }
 
-if (isHome) {
-  var dashboardBtn = document.createElement('a');
-  dashboardBtn.href = root + 'dashboard.html';
-  dashboardBtn.className = 'btn btn-gold nav-auth-btn';
-  dashboardBtn.textContent = 'Dashboard';
-  nav.appendChild(dashboardBtn);
 }
 ```
 
