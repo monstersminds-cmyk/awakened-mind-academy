@@ -22,8 +22,6 @@
     .book-actions{display:flex;gap:0.7rem;flex-wrap:wrap}
     .book-actions .btn{font-size:0.8rem;padding:0.5rem 1rem;flex:1;text-align:center}
     .locked-badge{display:inline-flex;align-items:center;gap:0.3rem;font-size:0.72rem;color:var(--text-dim);background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:0.25rem 0.7rem;margin-bottom:0.8rem}
-
-    /* MODAL */
     .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:1000;display:flex;align-items:center;justify-content:center;padding:1rem}
     .modal-box{background:var(--bg2);border:1px solid rgba(201,168,76,0.2);border-radius:var(--radius);padding:2rem;width:100%;max-width:620px;max-height:90vh;overflow-y:auto;position:relative}
     .modal-close{position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--text-dim);font-size:1.3rem;cursor:pointer}
@@ -39,6 +37,7 @@
     .modal-cta{background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:var(--radius);padding:1.2rem;text-align:center}
     .modal-cta p{font-size:0.85rem;color:var(--text-dim);margin-bottom:1rem}
     .modal-cta .btn{width:100%;font-size:0.9rem;padding:0.8rem}
+    .empty-state{text-align:center;padding:4rem 1rem;color:var(--text-dim)}
     .hidden{display:none}
   </style>
 </head>
@@ -64,7 +63,9 @@
     <h1 class="section-title">Books & Publications</h1>
     <p style="color:var(--text-dim);font-size:0.95rem;max-width:600px;margin-top:0.8rem;">Read the synopsis and a free preview of every book. Full access is available for purchase — contact Professor Kungu directly via WhatsApp to get your copy.</p>
   </div>
-  <div class="books-grid" id="books-grid"></div>
+  <div class="books-grid" id="books-grid">
+    <div class="empty-state">Loading books...</div>
+  </div>
 </div>
 
 <!-- BOOK MODAL -->
@@ -90,118 +91,69 @@
   </div>
 </div>
 
+<script src="js/main.js"></script>
 <script>
-var db = window.supabase.createClient(
-  'https://ffpppcbegvjskeujlqif.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZmcHBwY2JlZ3Zqc2tldWpscWlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExODM3MTQsImV4cCI6MjA5Njc1OTcxNH0.FZu3uNtxJ8KeYx-c2d79YC3ThKzC98W4Azaxzsoot2A'
-);
-
-var WHATSAPP = '+254796776986';
-
-var BOOKS = [
-  {
-    id: 1,
-    title: 'The Power of the Subconscious Mind',
-    cover: 'images/books/the power of the subconscious.png',
-    backcover: 'images/cover/social norms.png',
-    price: 'KSh 500',
-    synopsis: 'You did not choose your first beliefs. They were handed to you — by your family, your community, your culture — before you were old enough to question them. This book goes beneath the surface of who you think you are and examines the invisible architecture that was built inside you from childhood. The social norms you follow without thinking, the sense of self you defend without understanding where it came from, the patterns you repeat without knowing why — all of it is examined here. This is not a self-help book. It is an excavation.',
-    preview: 'Before you had language, you had experience. Before you had the ability to question what was happening around you, your brain was already learning — recording, filing, building a model of the world that would go on to govern almost every decision you ever made. The first chapter of your life was written without your consent. Most people never read it. They simply live it, over and over again, wondering why certain patterns refuse to break, why certain fears never fully disappear, why the version of themselves they want to become keeps running into the same invisible wall. That wall has a name. It was built in the years before memory, reinforced through childhood, and cemented by the time you were old enough to think you were making your own choices...'
-  },
-  {
-    id: 2,
-    title: 'New Psychology of Success',
-    cover: 'images/books/the new psychology of success.jpg',
-    backcover: 'images/cover/psychology of success.jpg',
-    price: 'KSh 500',
-    synopsis: 'The rules that built the last generation will not build the next one. Discipline alone is not enough. Hard work alone is not enough. This book is for the person who has been doing everything right and still feels stuck — because the framework they are working inside is outdated. Drawing on the psychology of belief, the mechanics of leverage, the law of abundance, and the demands of modern entrepreneurship, this book does not motivate you. It rewires you.',
-    preview: 'There is a version of success that was handed down to us like a family recipe — go to school, work hard, be consistent, save money, retire. For a certain era, in a certain economy, with a certain set of opportunities, this worked. It does not work anymore. Not because people are lazier or less disciplined than previous generations, but because the world those rules were built for no longer exists. The game changed. The rules did not. And millions of people are working harder than their parents ever did, following every instruction they were given, and arriving at a destination that was never actually promised to them...'
-  },
-  {
-    id: 3,
-    title: 'Beyond Diagnosis',
-    cover: 'images/books/beyond diagnosis.png',
-    backcover: 'images/cover/beyond diagnosis 2.jpeg',
-    price: 'KSh 500',
-    synopsis: 'For years, the diagnosis defined everything. What was possible, what was not, who Walter Kungu was allowed to become. This book is the account of what happened when he refused to accept that story — not through denial, not through toxic positivity, but through a ruthless, disciplined, deeply personal process of rebuilding from the inside out. Bipolar disorder does not get the last word here. The human mind does.',
-    preview: 'The first time a doctor puts a name to what is happening inside you, there is a strange relief in it. Finally, an explanation. Finally, a reason for the chaos. What nobody warns you about is what comes after the name — the quiet, insidious way a diagnosis can become an identity. The way people around you start to relate to the label rather than to you. The way you start to do the same. I am not writing this book to tell you that mental illness is not real. It is. I lived inside it for years in ways that almost ended everything. I am writing it to tell you that the story the diagnosis tries to write about your future is not the only story available to you...'
-  },
-  {
-    id: 4,
-    title: 'Biology of Belief',
-    cover: 'images/books/the biology of belief.png',
-    backcover: 'images/cover/the biology of belief.png',
-    price: 'KSh 500',
-    synopsis: 'Two people sit in the same church. They both claim faith. One\'s life transforms. The other\'s stays exactly the same. Why? This book answers that question using neuroscience, not theology. Belief is not a feeling — it is a neurological event, and like every event in the brain, it follows rules. Once you understand those rules, you stop wondering why your faith is not working and start understanding exactly what needs to change at the level of the brain itself.',
-    preview: 'Belief leaves a physical trace. This is not a metaphor — it is neuroscience. Every time you hold a thought long enough, with enough emotional charge behind it, your brain begins to build the infrastructure to support it. Neurons wire together. Neural pathways deepen. The thought stops being something you think and becomes something you are. This is why two people can sit under the same teaching, repeat the same affirmations, pray the same prayers — and walk away with completely different results. The difference is not the content of what they believe. It is the neurological depth at which they believe it...'
-  },
-  {
-    id: 5,
-    title: 'The Old Mind',
-    cover: 'images/books/the old mind.png',
-    backcover: 'images/cover/the old mind back cover.png',
-    price: 'KSh 500',
-    synopsis: 'Somewhere inside you is a brain that was built for survival in a world that no longer exists. It scans for threats that are not there. It resists change that would help you. It keeps you loyal to familiar pain over unfamiliar growth. This book is about that brain — the primal architecture underneath your modern thinking — and the precise, science-backed process of breaking free from it without destroying yourself in the attempt.',
-    preview: 'Two hundred thousand years ago, the brain that kept you alive was not the brain that helped you grow. It was the brain that kept you safe — suspicious of strangers, resistant to change, loyal to the familiar even when the familiar was dangerous. That brain saved your ancestors. It is also the reason you cannot seem to move forward no matter how much you want to. The primal brain does not know the difference between a physical threat and an emotional one. It does not know that the discomfort of starting a business is not the same as the danger of a predator. To it, fear is fear. And its answer to fear has always been the same: stop, retreat, stay where it is safe...'
-  },
-  {
-    id: 6,
-    title: 'What If',
-    cover: 'images/books/what if.png',
-    backcover: 'images/cover/what if 2.png',
-    price: 'KSh 500',
-    synopsis: 'What if the stories of Africa had been told by Africans? What if colonization had not rewritten the continent\'s sense of itself from the outside in? What if the belief systems, the knowledge, the identity that was systematically dismantled had instead been allowed to evolve on its own terms? This book does not mourn history. It imagines the version of it that was stolen — and in doing so, forces a confrontation with the version we are still living inside.',
-    preview: 'Every civilization tells itself a story about who it is. The story shapes the people. The people shape the story. For most of human history, Africa told its own stories — complex, layered, philosophically rich accounts of origin, purpose, and identity that had evolved over thousands of years across hundreds of distinct cultures. Then, in a remarkably short period of time, those stories were interrupted. Not erased entirely — you cannot erase what lives in people — but interrupted, reframed, subordinated to a different story told by people who had arrived from elsewhere and needed the continent to see itself through their eyes in order to take what they came for...'
-  }
-];
+var WHATSAPP = '254796776986';
+var allBooks = [];
 
 db.auth.getSession().then(function(result) {
   if (!result.data.session) { window.location.href = 'auth.html'; return; }
-  renderBooks();
+  loadBooks();
 });
 
 document.getElementById('logout-btn').addEventListener('click', function() {
   db.auth.signOut().then(function() { window.location.href = 'auth.html'; });
 });
 
+function loadBooks() {
+  db.from('books').select('*').eq('published', true).order('created_at', { ascending: false }).then(function(result) {
+    allBooks = result.data || [];
+    renderBooks();
+  });
+}
+
 function renderBooks() {
   var grid = document.getElementById('books-grid');
+  if (allBooks.length === 0) {
+    grid.innerHTML = '<div class="empty-state">No books published yet. Check back soon.</div>';
+    return;
+  }
   grid.innerHTML = '';
-  BOOKS.forEach(function(book) {
+  allBooks.forEach(function(book) {
     var card = document.createElement('div');
     card.className = 'book-card';
     card.innerHTML =
       '<div class="book-cover">' +
-        '<img src="' + book.cover + '" alt="' + book.title + '">' +
+        '<img src="' + (book.cover_url || '') + '" alt="' + book.title + '">' +
       '</div>' +
       '<div class="book-body">' +
         '<div class="locked-badge">🔒 Full book locked</div>' +
         '<div class="book-title">' + book.title + '</div>' +
-        '<div class="book-synopsis">' + book.synopsis + '</div>' +
-        '<div class="book-price">' + book.price + '</div>' +
+        '<div class="book-synopsis">' + (book.synopsis || '') + '</div>' +
+        '<div class="book-price">' + (book.price || 'KSh 500') + '</div>' +
         '<div class="book-actions">' +
           '<button class="btn btn-outline preview-btn" data-id="' + book.id + '">Read Preview</button>' +
-          '<a href="https://wa.me/' + WHATSAPP.replace('+','') + '?text=Hi%20Professor%20Kungu%2C%20I%20want%20to%20purchase%20' + encodeURIComponent(book.title) + '" target="_blank" class="btn btn-gold">Buy Now</a>' +
+          '<a href="https://wa.me/' + WHATSAPP + '?text=Hi%20Professor%20Kungu%2C%20I%20want%20to%20purchase%20' + encodeURIComponent(book.title) + '" target="_blank" class="btn btn-gold">Buy Now</a>' +
         '</div>' +
       '</div>';
     grid.appendChild(card);
   });
 
   document.querySelectorAll('.preview-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() { openModal(parseInt(btn.dataset.id)); });
+    btn.addEventListener('click', function() { openModal(btn.dataset.id); });
   });
 }
 
 function openModal(id) {
-  var book = BOOKS.find(function(b) { return b.id === id; });
+  var book = allBooks.find(function(b) { return b.id === id; });
   if (!book) return;
   document.getElementById('modal-title').textContent = book.title;
-  document.getElementById('modal-synopsis').textContent = book.synopsis;
-  document.getElementById('modal-preview').textContent = book.preview;
-  document.getElementById('modal-whatsapp-btn').href = 'https://wa.me/' + WHATSAPP.replace('+','') + '?text=Hi%20Professor%20Kungu%2C%20I%20want%20to%20purchase%20' + encodeURIComponent(book.title);
+  document.getElementById('modal-synopsis').textContent = book.synopsis || '';
+  document.getElementById('modal-preview').textContent = book.preview || 'Preview not available yet.';
+  document.getElementById('modal-whatsapp-btn').href = 'https://wa.me/' + WHATSAPP + '?text=Hi%20Professor%20Kungu%2C%20I%20want%20to%20purchase%20' + encodeURIComponent(book.title);
   var backImg = document.getElementById('modal-backcover');
-  if (book.backcover) {
-    backImg.src = book.backcover;
+  if (book.backcover_url) {
+    backImg.src = book.backcover_url;
     backImg.style.display = 'block';
   } else {
     backImg.style.display = 'none';
@@ -217,7 +169,5 @@ document.getElementById('book-modal').addEventListener('click', function(e) {
   if (e.target === this) this.classList.add('hidden');
 });
 </script>
-
-<script src="js/main.js"></script>
 </body>
 </html>
