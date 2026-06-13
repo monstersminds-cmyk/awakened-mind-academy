@@ -187,34 +187,8 @@ function toggleReaction(lessonId, reaction, alreadyReacted) {
   }
 }
 
-function setupComments(lessonId) {
-  var toggle = document.getElementById('comments-toggle-' + lessonId);
-  var area = document.getElementById('comments-area-' + lessonId);
-  var open = false;
-
-  toggle.addEventListener('click', function() {
-    open = !open;
-    if (open) {
-      area.classList.remove('hidden');
-      toggle.textContent = '💬 Hide comments';
-      loadComments(lessonId);
-    } else {
-      area.classList.add('hidden');
-      toggle.textContent = '💬 Show comments';
-    }
-  });
-
-  document.getElementById('comment-btn-' + lessonId).addEventListener('click', function() {
-    postComment(lessonId);
-  });
-
-  document.getElementById('comment-input-' + lessonId).addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') postComment(lessonId);
-  });
-}
-
 function loadComments(lessonId) {
-    db.from('lesson_comments').select('*').eq('lesson_id', lessonId)
+  db.from('lesson_comments').select('*').eq('lesson_id', lessonId).order('created_at', { ascending: true }).then(function(result) {
     var comments = result.data || [];
     var list = document.getElementById('comments-list-' + lessonId);
     if (comments.length === 0) {
@@ -234,23 +208,3 @@ function loadComments(lessonId) {
     });
   });
 }
-
-function postComment(lessonId) {
-  var input = document.getElementById('comment-input-' + lessonId);
-  var text = input.value.trim();
-  if (!text) return;
-  db.from('lesson_comments').insert({
-    lesson_id: lessonId,
-    user_id: currentUser.id,
-    content: text,
-    created_at: new Date().toISOString()
-  }).then(function(result) {
-    if (!result.error) {
-      input.value = '';
-      loadComments(lessonId);
-    }
-  });
-}
-</script>
-</body>
-</html>
