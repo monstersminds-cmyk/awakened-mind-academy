@@ -10,7 +10,7 @@
   <style>
     .admin-container{min-height:100vh;padding:7rem 5% 4rem;max-width:900px;margin:0 auto}
     .admin-header{margin-bottom:2.5rem}
-    .admin-tabs{display:flex;gap:0.5rem;margin-bottom:2rem;border-bottom:1px solid rgba(201,168,76,0.15);padding-bottom:0}
+    .admin-tabs{display:flex;gap:0.5rem;margin-bottom:2rem;border-bottom:1px solid rgba(201,168,76,0.15);padding-bottom:0;flex-wrap:wrap}
     .admin-tab{background:none;border:none;color:var(--text-dim);font-family:Inter,sans-serif;font-size:0.9rem;padding:0.6rem 1.2rem;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.2s}
     .admin-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
     .tab-panel{display:none}
@@ -66,7 +66,7 @@
 <div class="admin-container">
   <div class="admin-header">
     <p class="section-eyebrow">Admin Panel</p>
-    <h1 class="section-title">Manage Books</h1>
+    <h1 class="section-title">Manage Content</h1>
   </div>
 
   <div id="access-denied" style="display:none;text-align:center;padding:4rem 1rem;">
@@ -77,12 +77,17 @@
 
   <div id="admin-content" style="display:none;">
     <div class="admin-tabs">
-        <button class="admin-tab active" data-tab="add">Add Book</button>
-        <button class="admin-tab" data-tab="manage">Manage Books</button>
-        <button class="admin-tab" data-tab="video">Add Video</button>
-        <button class="admin-tab" data-tab="manage-videos">Manage Videos</button>
-      </div>
+      <button class="admin-tab active" data-tab="add">Add Book</button>
+      <button class="admin-tab" data-tab="manage">Manage Books</button>
+      <button class="admin-tab" data-tab="video">Add Video</button>
+      <button class="admin-tab" data-tab="manage-videos">Manage Videos</button>
+      <button class="admin-tab" data-tab="lesson">Add Lesson</button>
+      <button class="admin-tab" data-tab="manage-lessons">Manage Lessons</button>
+      <button class="admin-tab" data-tab="event">Add Event</button>
+      <button class="admin-tab" data-tab="manage-events">Manage Events</button>
+    </div>
 
+    <!-- ADD BOOK -->
     <div class="tab-panel active" id="tab-add">
       <div class="admin-message" id="add-message"></div>
       <div class="admin-form">
@@ -140,65 +145,176 @@
       </div>
     </div>
 
+    <!-- MANAGE BOOKS -->
     <div class="tab-panel" id="tab-manage">
-        <div class="admin-message" id="manage-message"></div>
-        <div class="books-list" id="admin-books-list">
-          <div class="empty-state">Loading books...</div>
-        </div>
+      <div class="admin-message" id="manage-message"></div>
+      <div class="books-list" id="admin-books-list">
+        <div class="empty-state">Loading books...</div>
       </div>
-  
-      <!-- ADD VIDEO TAB -->
-      <div class="tab-panel" id="tab-video">
-        <div class="admin-message" id="video-message"></div>
-        <div class="admin-form">
-          <h3>Video Details</h3>
-          <div class="form-grid">
-            <div class="form-group form-full">
-              <label>Video Title</label>
-              <input type="text" id="video-title" placeholder="e.g. How to Break Bad Habits">
-            </div>
-            <div class="form-group form-full">
-              <label>YouTube URL</label>
-              <input type="text" id="video-url" placeholder="e.g. https://www.youtube.com/watch?v=...">
-            </div>
-            <div class="form-group form-full">
-              <label>Description</label>
-              <textarea id="video-desc" placeholder="What will the student learn from this lesson..."></textarea>
-            </div>
-            <div class="form-group">
-              <label>Access</label>
-              <select id="video-paid">
-                <option value="false">Free — all logged in clients</option>
-                <option value="true">Paid — requires payment</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Price (if paid)</label>
-              <input type="text" id="video-price" placeholder="e.g. KSh 200" value="KSh 200">
-            </div>
-            <div class="form-group">
-              <label>Published</label>
-              <select id="video-published">
-                <option value="true">Yes — visible to clients</option>
-                <option value="false">No — hidden draft</option>
-              </select>
-            </div>
+    </div>
+
+    <!-- ADD VIDEO -->
+    <div class="tab-panel" id="tab-video">
+      <div class="admin-message" id="video-message"></div>
+      <div class="admin-form">
+        <h3>Video Details</h3>
+        <div class="form-grid">
+          <div class="form-group form-full">
+            <label>Video Title</label>
+            <input type="text" id="video-title" placeholder="e.g. How to Break Bad Habits">
           </div>
-          <div style="margin-top:1.5rem;">
-            <button class="btn btn-gold" id="save-video-btn" style="width:100%;padding:0.9rem;">Save Video Lesson</button>
+          <div class="form-group form-full">
+            <label>YouTube URL</label>
+            <input type="text" id="video-url" placeholder="e.g. https://www.youtube.com/watch?v=...">
+          </div>
+          <div class="form-group form-full">
+            <label>Description</label>
+            <textarea id="video-desc" placeholder="What will the student learn from this lesson..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Access</label>
+            <select id="video-paid">
+              <option value="false">Free — all logged in clients</option>
+              <option value="true">Paid — requires payment</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Price (if paid)</label>
+            <input type="text" id="video-price" placeholder="e.g. KSh 200" value="KSh 200">
+          </div>
+          <div class="form-group">
+            <label>Published</label>
+            <select id="video-published">
+              <option value="true">Yes — visible to clients</option>
+              <option value="false">No — hidden draft</option>
+            </select>
           </div>
         </div>
-      </div>
-  
-      <!-- MANAGE VIDEOS TAB -->
-      <div class="tab-panel" id="tab-manage-videos">
-        <div class="admin-message" id="manage-videos-message"></div>
-        <div class="books-list" id="admin-videos-list">
-          <div class="empty-state">Loading videos...</div>
+        <div style="margin-top:1.5rem;">
+          <button class="btn btn-gold" id="save-video-btn" style="width:100%;padding:0.9rem;">Save Video Lesson</button>
         </div>
       </div>
     </div>
 
+    <!-- MANAGE VIDEOS -->
+    <div class="tab-panel" id="tab-manage-videos">
+      <div class="admin-message" id="manage-videos-message"></div>
+      <div class="books-list" id="admin-videos-list">
+        <div class="empty-state">Loading videos...</div>
+      </div>
+    </div>
+
+    <!-- ADD LESSON -->
+    <div class="tab-panel" id="tab-lesson">
+      <div class="admin-message" id="lesson-message"></div>
+      <div class="admin-form">
+        <h3>Lesson Details</h3>
+        <div class="form-grid">
+          <div class="form-group form-full">
+            <label>Lesson Title</label>
+            <input type="text" id="lesson-title" placeholder="e.g. Why Your Mind Resists Change">
+          </div>
+          <div class="form-group form-full">
+            <label>Lesson Photo</label>
+            <div class="upload-box">
+              <input type="file" id="lesson-photo-file" accept="image/*">
+              <div class="upload-icon">🖼️</div>
+              <p>Click to upload lesson photo</p>
+              <p style="font-size:0.75rem;margin-top:0.3rem;">JPG, PNG under 5MB</p>
+            </div>
+            <div class="progress-bar" id="lesson-photo-progress"><div class="progress-fill" id="lesson-photo-progress-fill"></div></div>
+            <img id="lesson-photo-preview" class="upload-preview" alt="Photo preview">
+          </div>
+          <div class="form-group form-full">
+            <label>Lesson Content</label>
+            <textarea id="lesson-content" placeholder="Write your full lesson here. Be as detailed as you want — this is your teaching space." style="min-height:300px;"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Published</label>
+            <select id="lesson-published">
+              <option value="true">Yes — visible to clients</option>
+              <option value="false">No — hidden draft</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-top:1.5rem;">
+          <button class="btn btn-gold" id="save-lesson-btn" style="width:100%;padding:0.9rem;">Publish Lesson</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MANAGE LESSONS -->
+    <div class="tab-panel" id="tab-manage-lessons">
+      <div class="admin-message" id="manage-lessons-message"></div>
+      <div class="books-list" id="admin-lessons-list">
+        <div class="empty-state">Loading lessons...</div>
+      </div>
+    </div>
+
+    <!-- ADD EVENT -->
+    <div class="tab-panel" id="tab-event">
+      <div class="admin-message" id="event-message"></div>
+      <div class="admin-form">
+        <h3>Event Details</h3>
+        <div class="form-grid">
+          <div class="form-group form-full">
+            <label>Event Title</label>
+            <input type="text" id="event-title" placeholder="e.g. Weekly Zoom Mindset Session">
+          </div>
+          <div class="form-group form-full">
+            <label>Description</label>
+            <textarea id="event-desc" placeholder="What will happen at this event..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Date</label>
+            <input type="date" id="event-date">
+          </div>
+          <div class="form-group">
+            <label>Time</label>
+            <input type="text" id="event-time" placeholder="e.g. 7:00 PM EAT">
+          </div>
+          <div class="form-group form-full">
+            <label>Online Link (if online)</label>
+            <input type="text" id="event-link" placeholder="e.g. https://zoom.us/j/... or WhatsApp group link">
+          </div>
+          <div class="form-group form-full">
+            <label>Physical Location (if in-person)</label>
+            <input type="text" id="event-location" placeholder="e.g. Nairobi CBD, Delta Corner">
+          </div>
+          <div class="form-group">
+            <label>Access</label>
+            <select id="event-paid">
+              <option value="false">Free</option>
+              <option value="true">Paid</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Price (if paid)</label>
+            <input type="text" id="event-price" placeholder="e.g. KSh 500" value="KSh 500">
+          </div>
+          <div class="form-group">
+            <label>Published</label>
+            <select id="event-published">
+              <option value="true">Yes — visible to clients</option>
+              <option value="false">No — hidden draft</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-top:1.5rem;">
+          <button class="btn btn-gold" id="save-event-btn" style="width:100%;padding:0.9rem;">Save Event</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MANAGE EVENTS -->
+    <div class="tab-panel" id="tab-manage-events">
+      <div class="admin-message" id="manage-events-message"></div>
+      <div class="books-list" id="admin-events-list">
+        <div class="empty-state">Loading events...</div>
+      </div>
+    </div>
+
+  </div>
 </div>
 
 <script src="js/main.js"></script>
@@ -218,10 +334,8 @@ window.addEventListener('load', function() {
     var session = result.data.session;
     if (!session) { window.location.href = 'auth.html'; return; }
     currentUser = session.user;
-
     db.from('profiles').select('is_admin').eq('id', currentUser.id).then(function(res) {
-      var rows = res.data;
-      var isAdmin = rows && rows.length > 0 && rows[0].is_admin === true;
+      var isAdmin = res.data && res.data.length > 0 && res.data[0].is_admin === true;
       if (isAdmin) {
         document.getElementById('admin-content').style.display = 'block';
         document.getElementById('access-denied').style.display = 'none';
@@ -246,6 +360,8 @@ document.querySelectorAll('.admin-tab').forEach(function(btn) {
     document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
     if (btn.dataset.tab === 'manage') loadAdminBooks();
     if (btn.dataset.tab === 'manage-videos') loadAdminVideos();
+    if (btn.dataset.tab === 'manage-lessons') loadAdminLessons();
+    if (btn.dataset.tab === 'manage-events') loadAdminEvents();
   });
 });
 
@@ -264,28 +380,30 @@ function setupImagePreview(inputId, previewId) {
 }
 setupImagePreview('cover-file', 'cover-preview');
 setupImagePreview('backcover-file', 'backcover-preview');
+setupImagePreview('lesson-photo-file', 'lesson-photo-preview');
 
-function uploadImage(file, filename, progressId, fillId) {
+function uploadImage(file, bucket, folder, progressId, fillId) {
   return new Promise(function(resolve, reject) {
     var progress = document.getElementById(progressId);
     var fill = document.getElementById(fillId);
-    progress.style.display = 'block';
-    fill.style.width = '30%';
-    var path = 'covers/' + Date.now() + '_' + filename;
-    db.storage.from('book-covers').upload(path, file, { upsert: true }).then(function(result) {
+    if (progress) progress.style.display = 'block';
+    if (fill) fill.style.width = '30%';
+    var path = folder + '/' + Date.now() + '_' + file.name;
+    db.storage.from(bucket).upload(path, file, { upsert: true }).then(function(result) {
       if (result.error) {
-        progress.style.display = 'none';
+        if (progress) progress.style.display = 'none';
         reject(result.error);
         return;
       }
-      fill.style.width = '100%';
-      setTimeout(function() { progress.style.display = 'none'; }, 500);
-      var publicUrl = db.storage.from('book-covers').getPublicUrl(path).data.publicUrl;
+      if (fill) fill.style.width = '100%';
+      setTimeout(function() { if (progress) progress.style.display = 'none'; }, 500);
+      var publicUrl = db.storage.from(bucket).getPublicUrl(path).data.publicUrl;
       resolve(publicUrl);
     });
   });
 }
 
+// BOOKS
 document.getElementById('save-book-btn').addEventListener('click', function() {
   var title = document.getElementById('book-title').value.trim();
   var synopsis = document.getElementById('book-synopsis').value.trim();
@@ -303,28 +421,20 @@ document.getElementById('save-book-btn').addEventListener('click', function() {
   btn.textContent = 'Uploading...';
   btn.disabled = true;
 
-  var coverPromise = uploadImage(coverFile, coverFile.name, 'cover-progress', 'cover-progress-fill');
+  var coverPromise = uploadImage(coverFile, 'book-covers', 'covers', 'cover-progress', 'cover-progress-fill');
   var backcoverPromise = backcoverFile
-    ? uploadImage(backcoverFile, backcoverFile.name, 'backcover-progress', 'backcover-progress-fill')
+    ? uploadImage(backcoverFile, 'book-covers', 'covers', 'backcover-progress', 'backcover-progress-fill')
     : Promise.resolve(null);
 
   Promise.all([coverPromise, backcoverPromise]).then(function(urls) {
     db.from('books').insert({
-      title: title,
-      synopsis: synopsis,
-      preview: preview,
-      price: price,
-      cover_url: urls[0],
-      backcover_url: urls[1],
-      published: published,
+      title: title, synopsis: synopsis, preview: preview, price: price,
+      cover_url: urls[0], backcover_url: urls[1], published: published,
       created_at: new Date().toISOString()
     }).then(function(result) {
       btn.textContent = 'Upload & Publish Book';
       btn.disabled = false;
-      if (result.error) {
-        showMessage('add-message', 'Error saving book: ' + result.error.message, 'error');
-        return;
-      }
+      if (result.error) { showMessage('add-message', 'Error: ' + result.error.message, 'error'); return; }
       showMessage('add-message', 'Book published successfully.', 'success');
       document.getElementById('book-title').value = '';
       document.getElementById('book-synopsis').value = '';
@@ -346,48 +456,35 @@ function loadAdminBooks() {
   db.from('books').select('*').order('created_at', { ascending: false }).then(function(result) {
     var books = result.data || [];
     var container = document.getElementById('admin-books-list');
-    if (books.length === 0) {
-      container.innerHTML = '<div class="empty-state">No books yet. Add your first book in the Add tab.</div>';
-      return;
-    }
+    if (books.length === 0) { container.innerHTML = '<div class="empty-state">No books yet.</div>'; return; }
     container.innerHTML = '';
     books.forEach(function(book) {
       var div = document.createElement('div');
       div.className = 'book-admin-item';
       div.innerHTML =
         '<img class="book-admin-cover" src="' + (book.cover_url || '') + '" alt="' + book.title + '">' +
-        '<div class="book-admin-info">' +
-          '<div class="book-admin-title">' + book.title + '</div>' +
-          '<div class="book-admin-price">' + (book.price || 'KSh 500') + '</div>' +
-        '</div>' +
+        '<div class="book-admin-info"><div class="book-admin-title">' + book.title + '</div><div class="book-admin-price">' + (book.price || 'KSh 500') + '</div></div>' +
         '<div class="book-admin-actions">' +
-          '<button class="publish-toggle ' + (book.published ? '' : 'unpublished') + '" data-id="' + book.id + '" data-published="' + book.published + '">' +
-            (book.published ? 'Published' : 'Hidden') +
-          '</button>' +
+          '<button class="publish-toggle ' + (book.published ? '' : 'unpublished') + '" data-id="' + book.id + '" data-published="' + book.published + '">' + (book.published ? 'Published' : 'Hidden') + '</button>' +
           '<button class="btn-danger delete-btn" data-id="' + book.id + '">Delete</button>' +
         '</div>';
       container.appendChild(div);
     });
-
     container.querySelectorAll('.publish-toggle').forEach(function(btn) {
       btn.addEventListener('click', function() {
-        var newState = btn.dataset.published === 'true' ? false : true;
-        db.from('books').update({ published: newState }).eq('id', btn.dataset.id).then(function() {
-          loadAdminBooks();
-        });
+        db.from('books').update({ published: btn.dataset.published !== 'true' }).eq('id', btn.dataset.id).then(function() { loadAdminBooks(); });
       });
     });
-
     container.querySelectorAll('.delete-btn').forEach(function(btn) {
       btn.addEventListener('click', function() {
-        if (!confirm('Delete this book permanently? This cannot be undone.')) return;
-        db.from('books').delete().eq('id', btn.dataset.id).then(function() {
-          loadAdminBooks();
-        });
+        if (!confirm('Delete this book permanently?')) return;
+        db.from('books').delete().eq('id', btn.dataset.id).then(function() { loadAdminBooks(); });
       });
     });
   });
 }
+
+// VIDEOS
 document.getElementById('save-video-btn').addEventListener('click', function() {
   var title = document.getElementById('video-title').value.trim();
   var url = document.getElementById('video-url').value.trim();
@@ -404,20 +501,13 @@ document.getElementById('save-video-btn').addEventListener('click', function() {
   btn.disabled = true;
 
   db.from('videos').insert({
-    title: title,
-    youtube_url: url,
-    description: desc,
-    is_paid: isPaid,
-    price: price,
-    published: published,
+    title: title, youtube_url: url, description: desc,
+    is_paid: isPaid, price: price, published: published,
     created_at: new Date().toISOString()
   }).then(function(result) {
     btn.textContent = 'Save Video Lesson';
     btn.disabled = false;
-    if (result.error) {
-      showMessage('video-message', 'Error saving video: ' + result.error.message, 'error');
-      return;
-    }
+    if (result.error) { showMessage('video-message', 'Error: ' + result.error.message, 'error'); return; }
     showMessage('video-message', 'Video saved successfully.', 'success');
     document.getElementById('video-title').value = '';
     document.getElementById('video-url').value = '';
@@ -429,44 +519,170 @@ function loadAdminVideos() {
   db.from('videos').select('*').order('created_at', { ascending: false }).then(function(result) {
     var videos = result.data || [];
     var container = document.getElementById('admin-videos-list');
-    if (videos.length === 0) {
-      container.innerHTML = '<div class="empty-state">No videos yet. Add your first video in the Add Video tab.</div>';
-      return;
-    }
+    if (videos.length === 0) { container.innerHTML = '<div class="empty-state">No videos yet.</div>'; return; }
     container.innerHTML = '';
     videos.forEach(function(video) {
       var div = document.createElement('div');
       div.className = 'book-admin-item';
       div.innerHTML =
         '<div style="font-size:2rem;flex-shrink:0;">🎥</div>' +
-        '<div class="book-admin-info">' +
-          '<div class="book-admin-title">' + video.title + '</div>' +
-          '<div class="book-admin-price">' + (video.is_paid ? (video.price || 'KSh 200') + ' — Paid' : 'Free') + '</div>' +
-        '</div>' +
+        '<div class="book-admin-info"><div class="book-admin-title">' + video.title + '</div><div class="book-admin-price">' + (video.is_paid ? (video.price || 'KSh 200') + ' — Paid' : 'Free') + '</div></div>' +
         '<div class="book-admin-actions">' +
-          '<button class="publish-toggle ' + (video.published ? '' : 'unpublished') + '" data-id="' + video.id + '" data-published="' + video.published + '">' +
-            (video.published ? 'Published' : 'Hidden') +
-          '</button>' +
+          '<button class="publish-toggle ' + (video.published ? '' : 'unpublished') + '" data-id="' + video.id + '" data-published="' + video.published + '">' + (video.published ? 'Published' : 'Hidden') + '</button>' +
           '<button class="btn-danger delete-video-btn" data-id="' + video.id + '">Delete</button>' +
         '</div>';
       container.appendChild(div);
     });
-
     container.querySelectorAll('.publish-toggle').forEach(function(btn) {
       btn.addEventListener('click', function() {
-        var newState = btn.dataset.published === 'true' ? false : true;
-        db.from('videos').update({ published: newState }).eq('id', btn.dataset.id).then(function() {
-          loadAdminVideos();
-        });
+        db.from('videos').update({ published: btn.dataset.published !== 'true' }).eq('id', btn.dataset.id).then(function() { loadAdminVideos(); });
       });
     });
-
     container.querySelectorAll('.delete-video-btn').forEach(function(btn) {
       btn.addEventListener('click', function() {
         if (!confirm('Delete this video permanently?')) return;
-        db.from('videos').delete().eq('id', btn.dataset.id).then(function() {
-          loadAdminVideos();
-        });
+        db.from('videos').delete().eq('id', btn.dataset.id).then(function() { loadAdminVideos(); });
+      });
+    });
+  });
+}
+
+// LESSONS
+document.getElementById('save-lesson-btn').addEventListener('click', function() {
+  var title = document.getElementById('lesson-title').value.trim();
+  var content = document.getElementById('lesson-content').value.trim();
+  var published = document.getElementById('lesson-published').value === 'true';
+  var photoFile = document.getElementById('lesson-photo-file').files[0];
+
+  if (!title) { showMessage('lesson-message', 'Please enter a lesson title.', 'error'); return; }
+  if (!content) { showMessage('lesson-message', 'Please write the lesson content.', 'error'); return; }
+
+  var btn = document.getElementById('save-lesson-btn');
+  btn.textContent = 'Publishing...';
+  btn.disabled = true;
+
+  var photoPromise = photoFile
+    ? uploadImage(photoFile, 'lesson-photos', 'photos', 'lesson-photo-progress', 'lesson-photo-progress-fill')
+    : Promise.resolve(null);
+
+  photoPromise.then(function(photoUrl) {
+    db.from('lessons').insert({
+      title: title, content: content, photo_url: photoUrl,
+      published: published, created_at: new Date().toISOString()
+    }).then(function(result) {
+      btn.textContent = 'Publish Lesson';
+      btn.disabled = false;
+      if (result.error) { showMessage('lesson-message', 'Error: ' + result.error.message, 'error'); return; }
+      showMessage('lesson-message', 'Lesson published successfully.', 'success');
+      document.getElementById('lesson-title').value = '';
+      document.getElementById('lesson-content').value = '';
+      document.getElementById('lesson-photo-file').value = '';
+      document.getElementById('lesson-photo-preview').style.display = 'none';
+    });
+  }).catch(function(err) {
+    btn.textContent = 'Publish Lesson';
+    btn.disabled = false;
+    showMessage('lesson-message', 'Upload failed: ' + err.message, 'error');
+  });
+});
+
+function loadAdminLessons() {
+  db.from('lessons').select('*').order('created_at', { ascending: false }).then(function(result) {
+    var lessons = result.data || [];
+    var container = document.getElementById('admin-lessons-list');
+    if (lessons.length === 0) { container.innerHTML = '<div class="empty-state">No lessons yet.</div>'; return; }
+    container.innerHTML = '';
+    lessons.forEach(function(lesson) {
+      var div = document.createElement('div');
+      div.className = 'book-admin-item';
+      div.innerHTML =
+        '<div style="font-size:2rem;flex-shrink:0;">📝</div>' +
+        '<div class="book-admin-info"><div class="book-admin-title">' + lesson.title + '</div><div class="book-admin-price">Free for all clients</div></div>' +
+        '<div class="book-admin-actions">' +
+          '<button class="publish-toggle ' + (lesson.published ? '' : 'unpublished') + '" data-id="' + lesson.id + '" data-published="' + lesson.published + '">' + (lesson.published ? 'Published' : 'Hidden') + '</button>' +
+          '<button class="btn-danger delete-lesson-btn" data-id="' + lesson.id + '">Delete</button>' +
+        '</div>';
+      container.appendChild(div);
+    });
+    container.querySelectorAll('.publish-toggle').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        db.from('lessons').update({ published: btn.dataset.published !== 'true' }).eq('id', btn.dataset.id).then(function() { loadAdminLessons(); });
+      });
+    });
+    container.querySelectorAll('.delete-lesson-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        if (!confirm('Delete this lesson permanently?')) return;
+        db.from('lessons').delete().eq('id', btn.dataset.id).then(function() { loadAdminLessons(); });
+      });
+    });
+  });
+}
+
+// EVENTS
+document.getElementById('save-event-btn').addEventListener('click', function() {
+  var title = document.getElementById('event-title').value.trim();
+  var desc = document.getElementById('event-desc').value.trim();
+  var date = document.getElementById('event-date').value;
+  var time = document.getElementById('event-time').value.trim();
+  var link = document.getElementById('event-link').value.trim();
+  var location = document.getElementById('event-location').value.trim();
+  var isPaid = document.getElementById('event-paid').value === 'true';
+  var price = document.getElementById('event-price').value.trim();
+  var published = document.getElementById('event-published').value === 'true';
+
+  if (!title) { showMessage('event-message', 'Please enter an event title.', 'error'); return; }
+  if (!date) { showMessage('event-message', 'Please select a date.', 'error'); return; }
+
+  var btn = document.getElementById('save-event-btn');
+  btn.textContent = 'Saving...';
+  btn.disabled = true;
+
+  db.from('events').insert({
+    title: title, description: desc, event_date: date, event_time: time,
+    online_link: link || null, location: location || null,
+    is_paid: isPaid, price: price, published: published,
+    created_at: new Date().toISOString()
+  }).then(function(result) {
+    btn.textContent = 'Save Event';
+    btn.disabled = false;
+    if (result.error) { showMessage('event-message', 'Error: ' + result.error.message, 'error'); return; }
+    showMessage('event-message', 'Event saved successfully.', 'success');
+    document.getElementById('event-title').value = '';
+    document.getElementById('event-desc').value = '';
+    document.getElementById('event-date').value = '';
+    document.getElementById('event-time').value = '';
+    document.getElementById('event-link').value = '';
+    document.getElementById('event-location').value = '';
+  });
+});
+
+function loadAdminEvents() {
+  db.from('events').select('*').order('event_date', { ascending: true }).then(function(result) {
+    var events = result.data || [];
+    var container = document.getElementById('admin-events-list');
+    if (events.length === 0) { container.innerHTML = '<div class="empty-state">No events yet.</div>'; return; }
+    container.innerHTML = '';
+    events.forEach(function(event) {
+      var div = document.createElement('div');
+      div.className = 'book-admin-item';
+      div.innerHTML =
+        '<div style="font-size:2rem;flex-shrink:0;">🗓️</div>' +
+        '<div class="book-admin-info"><div class="book-admin-title">' + event.title + '</div><div class="book-admin-price">' + event.event_date + ' · ' + (event.is_paid ? (event.price || 'KSh 500') + ' — Paid' : 'Free') + '</div></div>' +
+        '<div class="book-admin-actions">' +
+          '<button class="publish-toggle ' + (event.published ? '' : 'unpublished') + '" data-id="' + event.id + '" data-published="' + event.published + '">' + (event.published ? 'Published' : 'Hidden') + '</button>' +
+          '<button class="btn-danger delete-event-btn" data-id="' + event.id + '">Delete</button>' +
+        '</div>';
+      container.appendChild(div);
+    });
+    container.querySelectorAll('.publish-toggle').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        db.from('events').update({ published: btn.dataset.published !== 'true' }).eq('id', btn.dataset.id).then(function() { loadAdminEvents(); });
+      });
+    });
+    container.querySelectorAll('.delete-event-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        if (!confirm('Delete this event permanently?')) return;
+        db.from('events').delete().eq('id', btn.dataset.id).then(function() { loadAdminEvents(); });
       });
     });
   });
