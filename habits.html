@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Habit Tracker — Awakened Mind Academy</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/png" href="images/AWAKENED_LOGO2.png">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <style>
+    .habits-container{min-height:100vh;padding:7rem 5% 4rem;max-width:900px;margin:0 auto}
+    .habits-header{margin-bottom:2rem}
+    .tab-bar{display:flex;gap:0.5rem;margin-bottom:2rem;border-bottom:1px solid rgba(201,168,76,0.15);padding-bottom:0}
+    .tab-btn{background:none;border:none;color:var(--text-dim);font-family:Inter,sans-serif;font-size:0.9rem;padding:0.6rem 1.2rem;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.2s}
+    .tab-btn.active{color:var(--gold);border-bottom-color:var(--gold)}
+    .tab-content{display:none}
+    .tab-content.active{display:block}
+    .habit-section{margin-bottom:2.5rem}
+    .habit-section h3{font-size:0.78rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);margin-bottom:1rem}
+    .habit-item{display:flex;align-items:center;gap:1rem;background:var(--bg2);border:1px solid rgba(201,168,76,0.08);border-radius:var(--radius);padding:1rem 1.2rem;margin-bottom:0.6rem;transition:border-color 0.2s}
+    .habit-item.done{border-color:rgba(201,168,76,0.35);opacity:0.7}
+    .habit-check{width:22px;height:22px;border-radius:50%;border:2px solid rgba(201,168,76,0.4);background:none;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+    .habit-check.checked{background:var(--gold);border-color:var(--gold)}
+    .habit-check.checked::after{content:'✓';color:#1c1210;font-size:0.75rem;font-weight:700}
+    .habit-info{flex:1}
+    .habit-name{font-size:0.95rem;font-weight:500;margin-bottom:0.2rem}
+    .habit-streak{font-size:0.78rem;color:var(--gold)}
+    .habit-delete{background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:1rem;padding:0.2rem 0.5rem;opacity:0.5;transition:opacity 0.2s}
+    .habit-delete:hover{opacity:1;color:#ff5050}
+    .add-habit-box{background:var(--bg2);border:1px dashed rgba(201,168,76,0.25);border-radius:var(--radius);padding:1.2rem;margin-top:1rem}
+    .add-habit-box h4{font-size:0.8rem;color:var(--text-dim);margin-bottom:0.8rem;text-transform:uppercase;letter-spacing:0.08em}
+    .preset-grid{display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem}
+    .preset-tag{background:var(--bg);border:1px solid rgba(201,168,76,0.2);border-radius:20px;padding:0.35rem 0.85rem;font-size:0.78rem;color:var(--text-dim);cursor:pointer;transition:all 0.2s}
+    .preset-tag:hover{border-color:var(--gold);color:var(--gold)}
+    .custom-add{display:flex;gap:0.5rem;margin-top:0.8rem}
+    .custom-add input{flex:1;background:var(--bg);border:1px solid rgba(201,168,76,0.2);border-radius:var(--radius);padding:0.6rem 1rem;color:var(--text);font-family:Inter,sans-serif;font-size:0.85rem;outline:none}
+    .custom-add input:focus{border-color:var(--gold)}
+    .custom-add button{background:var(--gold);border:none;border-radius:var(--radius);padding:0.6rem 1.2rem;color:#1c1210;font-weight:700;font-size:0.85rem;cursor:pointer}
+    .empty-state{text-align:center;padding:3rem 1rem;color:var(--text-dim);font-size:0.9rem}
+    .trial-banner{background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.25);border-radius:var(--radius);padding:0.8rem 1.2rem;margin-bottom:1.5rem;display:none;font-size:0.85rem;color:var(--gold)}
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Awakened Mind Academy</a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="habits.html" class="active">Habits</a>
+    <a href="profile.html">Profile</a>
+    <button id="logout-btn" class="btn btn-outline" style="font-size:0.8rem;padding:0.5rem 1.2rem;">Logout</button>
+  </div>
+  <button class="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+
+<div class="habits-container">
+  <div class="habits-header">
+    <p class="section-eyebrow">Your Progress</p>
+    <h1 class="section-title">Habit Tracker</h1>
+  </div>
+
+  <div class="trial-banner" id="trial-banner">
+    ⏳ Your free trial ends in <span id="trial-days">30</span> days. Keep building your streaks.
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" data-tab="daily">Daily</button>
+    <button class="tab-btn" data-tab="weekly">Weekly</button>
+    <button class="tab-btn" data-tab="monthly">Monthly</button>
+  </div>
+
+  <!-- DAILY TAB -->
+  <div class="tab-content active" id="tab-daily">
+    <div class="habit-section">
+      <h3>Today's Habits</h3>
+      <div id="daily-list"><div class="empty-state">No daily habits yet. Add one below.</div></div>
+    </div>
+    <div class="add-habit-box">
+      <h4>Add a Daily Habit</h4>
+      <div class="preset-grid" id="daily-presets"></div>
+      <div class="custom-add">
+        <input type="text" id="daily-custom-input" placeholder="Type your own habit...">
+        <button id="daily-add-btn">Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- WEEKLY TAB -->
+  <div class="tab-content" id="tab-weekly">
+    <div class="habit-section">
+      <h3>This Week's Habits</h3>
+      <div id="weekly-list"><div class="empty-state">No weekly habits yet. Add one below.</div></div>
+    </div>
+    <div class="add-habit-box">
+      <h4>Add a Weekly Habit</h4>
+      <div class="preset-grid" id="weekly-presets"></div>
+      <div class="custom-add">
+        <input type="text" id="weekly-custom-input" placeholder="Type your own habit...">
+        <button id="weekly-add-btn">Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MONTHLY TAB -->
+  <div class="tab-content" id="tab-monthly">
+    <div class="habit-section">
+      <h3>This Month's Habits</h3>
+      <div id="monthly-list"><div class="empty-state">No monthly habits yet. Add one below.</div></div>
+    </div>
+    <div class="add-habit-box">
+      <h4>Add a Monthly Habit</h4>
+      <div class="preset-grid" id="monthly-presets"></div>
+      <div class="custom-add">
+        <input type="text" id="monthly-custom-input" placeholder="Type your own habit...">
+        <button id="monthly-add-btn">Add</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var db = window.supabase.createClient(
+  'https://ffpppcbegvjskeujlqif.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZmcHBwY2JlZ3Zqc2tldWpscWlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExODM3MTQsImV4cCI6MjA5Njc1OTcxNH0.FZu3uNtxJ8KeYx-c2d79YC3ThKzC98W4Azaxzsoot2A'
+);
+
+var currentUser = null;
+var allHabits = [];
+var todayStr = new Date().toISOString().split('T')[0];
+
+var PRESETS = {
+  daily: [
+    'Wake up before 6am','Morning prayer / meditation','Cold shower','Exercise for 30 mins',
+    'Read for 30 mins','No phone first hour of day','Drink 8 glasses of water','Journal your thoughts',
+    'Plan your day before starting','No social media before 9am','Eat a healthy breakfast',
+    'Review your goals','Practice gratitude','Sleep before 10pm','No eating after 8pm',
+    'Walk for 20 mins','Study something new','Avoid negative self-talk','Call someone you care about',
+    'Spend 1 hour on your business'
+  ],
+  weekly: [
+    'Deep clean your workspace','Review your weekly goals','Budget review','Cook a healthy meal',
+    'Visit family or a friend','One long workout session','Read one book chapter',
+    'Write a reflection of your week','Plan next week in advance','Do something that scares you',
+    'Spend time in nature','Practice a new skill','Attend a church or community meeting',
+    'Review your finances','One day of complete rest'
+  ],
+  monthly: [
+    'Review and reset your goals','Track your income and expenses','Read one full book',
+    'Assess your habit streaks','Write a letter to your future self','Deep reflection session',
+    'Learn one new thing deeply','Plan next month in advance','Check in with your mentor',
+    'Evaluate your relationships','Review your health progress','Set one bold new target',
+    'Celebrate one win from this month'
+  ]
+};
+
+// Auth check
+db.auth.getSession().then(function(result) {
+  if (!result.data.session) {
+    window.location.href = 'auth.html';
+    return;
+  }
+  currentUser = result.data.session.user;
+  loadHabits();
+});
+
+// Tabs
+document.querySelectorAll('.tab-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+    document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+// Logout
+document.getElementById('logout-btn').addEventListener('click', function() {
+  db.auth.signOut().then(function() { window.location.href = 'auth.html'; });
+});
+
+// Render presets
+function renderPresets() {
+  ['daily','weekly','monthly'].forEach(function(type) {
+    var container = document.getElementById(type + '-presets');
+    container.innerHTML = '';
+    PRESETS[type].forEach(function(name) {
+      var alreadyAdded = allHabits.some(function(h) { return h.name === name && h.type === type; });
+      if (alreadyAdded) return;
+      var tag = document.createElement('div');
+      tag.className = 'preset-tag';
+      tag.textContent = '+ ' + name;
+      tag.addEventListener('click', function() { addHabit(name, type); });
+      container.appendChild(tag);
+    });
+  });
+}
+
+// Load habits from Supabase
+function loadHabits() {
+  db.from('habits').select('*').eq('user_id', currentUser.id).then(function(result) {
+    allHabits = result.data || [];
+    renderAll();
+  });
+}
+
+// Render all three lists
+function renderAll() {
+  renderList('daily');
+  renderList('weekly');
+  renderList('monthly');
+  renderPresets();
+}
+
+function renderList(type) {
+  var container = document.getElementById(type + '-list');
+  var habits = allHabits.filter(function(h) { return h.type === type; });
+  if (habits.length === 0) {
+    container.innerHTML = '<div class="empty-state">No ' + type + ' habits yet. Add one below.</div>';
+    return;
+  }
+  container.innerHTML = '';
+  habits.forEach(function(habit) {
+    var isDone = habit.last_done === todayStr;
+    var item = document.createElement('div');
+    item.className = 'habit-item' + (isDone ? ' done' : '');
+    item.innerHTML =
+      '<div class="habit-check' + (isDone ? ' checked' : '') + '" data-id="' + habit.id + '"></div>' +
+      '<div class="habit-info">' +
+        '<div class="habit-name">' + habit.name + '</div>' +
+        '<div class="habit-streak">🔥 ' + (habit.streak || 0) + ' day streak</div>' +
+      '</div>' +
+      '<button class="habit-delete" data-id="' + habit.id + '">✕</button>';
+    container.appendChild(item);
+  });
+
+  // Check buttons
+  container.querySelectorAll('.habit-check').forEach(function(btn) {
+    btn.addEventListener('click', function() { toggleHabit(btn.dataset.id); });
+  });
+
+  // Delete buttons
+  container.querySelectorAll('.habit-delete').forEach(function(btn) {
+    btn.addEventListener('click', function() { deleteHabit(btn.dataset.id); });
+  });
+}
+
+// Add habit
+function addHabit(name, type) {
+  if (!name.trim()) return;
+  db.from('habits').insert({
+    user_id: currentUser.id,
+    name: name.trim(),
+    type: type,
+    streak: 0,
+    last_done: null,
+    created_at: new Date().toISOString()
+  }).then(function(result) {
+    if (!result.error) loadHabits();
+  });
+}
+
+// Toggle done
+function toggleHabit(id) {
+  var habit = allHabits.find(function(h) { return h.id == id; });
+  if (!habit) return;
+  var isDone = habit.last_done === todayStr;
+  var newStreak = isDone ? Math.max(0, (habit.streak || 1) - 1) : (habit.streak || 0) + 1;
+  var newLastDone = isDone ? null : todayStr;
+  db.from('habits').update({
+    last_done: newLastDone,
+    streak: newStreak
+  }).eq('id', id).then(function(result) {
+    if (!result.error) loadHabits();
+  });
+}
+
+// Delete habit
+function deleteHabit(id) {
+  db.from('habits').delete().eq('id', id).then(function(result) {
+    if (!result.error) loadHabits();
+  });
+}
+
+// Custom add buttons
+['daily','weekly','monthly'].forEach(function(type) {
+  document.getElementById(type + '-add-btn').addEventListener('click', function() {
+    var input = document.getElementById(type + '-custom-input');
+    addHabit(input.value, type);
+    input.value = '';
+  });
+  document.getElementById(type + '-custom-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') { document.getElementById(type + '-add-btn').click(); }
+  });
+});
+</script>
+
+<script src="js/main.js"></script>
+</body>
+</html>
