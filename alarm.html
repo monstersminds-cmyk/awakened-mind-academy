@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alarms — Awakened Mind Academy</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/png" href="images/AWAKENED_LOGO2.png">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <style>
+    .alarm-container{min-height:100vh;padding:7rem 5% 4rem;max-width:900px;margin:0 auto}
+    .alarm-header{margin-bottom:2rem}
+    .alarm-note{background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.2);border-radius:var(--radius);padding:0.9rem 1.2rem;font-size:0.82rem;color:var(--text-dim);margin-bottom:2rem}
+    .alarm-note span{color:var(--gold)}
+    .add-alarm-box{background:var(--bg2);border:1px solid rgba(201,168,76,0.15);border-radius:var(--radius);padding:1.8rem;margin-bottom:2.5rem}
+    .add-alarm-box h3{font-size:0.78rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);margin-bottom:1.2rem}
+    .alarm-form{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+    @media(max-width:600px){.alarm-form{grid-template-columns:1fr}}
+    .alarm-form .form-group{display:flex;flex-direction:column;gap:0.4rem}
+    .alarm-form label{font-size:0.78rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-dim)}
+    .alarm-form input,.alarm-form select{background:var(--bg);border:1px solid rgba(201,168,76,0.2);border-radius:var(--radius);padding:0.7rem 1rem;color:var(--text);font-family:Inter,sans-serif;font-size:0.88rem;outline:none}
+    .alarm-form input:focus,.alarm-form select:focus{border-color:var(--gold)}
+    .alarm-form select option{background:var(--bg2)}
+    .alarm-form-full{grid-column:1/-1}
+    .alarm-list-section h3{font-size:0.78rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);margin-bottom:1rem}
+    .alarm-item{background:var(--bg2);border:1px solid rgba(201,168,76,0.1);border-radius:var(--radius);padding:1.2rem 1.5rem;margin-bottom:0.8rem;display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap}
+    .alarm-item.inactive{opacity:0.5}
+    .alarm-time-display{font-size:1.8rem;font-weight:800;color:var(--gold);min-width:90px;font-variant-numeric:tabular-nums}
+    .alarm-info{flex:1}
+    .alarm-label{font-size:0.95rem;font-weight:600;margin-bottom:0.2rem}
+    .alarm-meta{font-size:0.78rem;color:var(--text-dim)}
+    .alarm-actions{display:flex;align-items:center;gap:0.8rem}
+    .toggle-switch{position:relative;width:44px;height:24px;cursor:pointer}
+    .toggle-switch input{opacity:0;width:0;height:0}
+    .toggle-track{position:absolute;inset:0;background:rgba(255,255,255,0.1);border-radius:24px;transition:background 0.2s}
+    .toggle-track::before{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:3px;left:3px;transition:transform 0.2s}
+    .toggle-switch input:checked + .toggle-track{background:var(--gold)}
+    .toggle-switch input:checked + .toggle-track::before{transform:translateX(20px)}
+    .alarm-delete{background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:1rem;opacity:0.5;transition:opacity 0.2s;padding:0.2rem 0.4rem}
+    .alarm-delete:hover{opacity:1;color:#ff5050}
+    .empty-state{text-align:center;padding:3rem 1rem;color:var(--text-dim);font-size:0.9rem}
+    .ringing-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;display:flex;align-items:center;justify-content:center;padding:1rem}
+    .ringing-box{background:var(--bg2);border:2px solid var(--gold);border-radius:var(--radius);padding:3rem 2rem;text-align:center;max-width:380px;width:100%}
+    .ringing-icon{font-size:4rem;margin-bottom:1rem;animation:ring 0.5s infinite alternate}
+    @keyframes ring{from{transform:rotate(-15deg)}to{transform:rotate(15deg)}}
+    .ringing-time{font-size:3rem;font-weight:800;color:var(--gold);margin-bottom:0.5rem}
+    .ringing-label{font-size:1.1rem;color:var(--white);margin-bottom:2rem}
+    .hidden{display:none}
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Awakened Mind Academy</a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="habits.html">Habits</a>
+    <a href="todo.html">To-Do</a>
+    <a href="alarm.html" class="active">Alarms</a>
+    <button id="logout-btn" class="btn btn-outline" style="font-size:0.8rem;padding:0.5rem 1.2rem;">Logout</button>
+  </div>
+  <button class="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+
+<div class="alarm-container">
+  <div class="alarm-header">
+    <p class="section-eyebrow">Stay On Schedule</p>
+    <h1 class="section-title">Alarms & Reminders</h1>
+  </div>
+
+  <div class="alarm-note">
+    <span>Note:</span> Alarms work while this page or tab is open. Full background alarms activate when the app is installed on your phone — coming soon.
+  </div>
+
+  <div class="add-alarm-box">
+    <h3>Set a New Alarm</h3>
+    <div class="alarm-form">
+      <div class="form-group">
+        <label>Label</label>
+        <input type="text" id="alarm-label-input" placeholder="e.g. Morning meditation">
+      </div>
+      <div class="form-group">
+        <label>Time</label>
+        <input type="time" id="alarm-time-input">
+      </div>
+      <div class="form-group">
+        <label>Repeat</label>
+        <select id="alarm-repeat-input">
+          <option value="once">Once</option>
+          <option value="daily">Every Day</option>
+          <option value="weekdays">Weekdays Only</option>
+          <option value="weekends">Weekends Only</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Sound</label>
+        <select id="alarm-sound-input">
+          <option value="bell">Bell</option>
+          <option value="chime">Chime</option>
+          <option value="beep">Beep</option>
+        </select>
+      </div>
+      <div class="alarm-form-full">
+        <button class="btn btn-gold" id="save-alarm-btn" style="width:100%;">Save Alarm</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="alarm-list-section">
+    <h3>Your Alarms</h3>
+    <div id="alarm-list"><div class="empty-state">No alarms set yet. Add one above.</div></div>
+  </div>
+</div>
+
+<!-- RINGING OVERLAY -->
+<div class="ringing-overlay hidden" id="ringing-overlay">
+  <div class="ringing-box">
+    <div class="ringing-icon">🔔</div>
+    <div class="ringing-time" id="ringing-time"></div>
+    <div class="ringing-label" id="ringing-label"></div>
+    <button class="btn btn-gold" id="dismiss-alarm-btn" style="width:100%;font-size:1rem;padding:1rem;">Dismiss</button>
+  </div>
+</div>
+
+<script>
+var db = window.supabase.createClient(
+  'https://ffpppcbegvjskeujlqif.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZmcHBwY2JlZ3Zqc2tldWpscWlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExODM3MTQsImV4cCI6MjA5Njc1OTcxNH0.FZu3uNtxJ8KeYx-c2d79YC3ThKzC98W4Azaxzsoot2A'
+);
+
+var currentUser = null;
+var allAlarms = [];
+var audioCtx = null;
+var ringInterval = null;
+var firedToday = {};
+
+db.auth.getSession().then(function(result) {
+  if (!result.data.session) { window.location.href = 'auth.html'; return; }
+  currentUser = result.data.session.user;
+  loadAlarms();
+  setInterval(checkAlarms, 10000);
+  checkAlarms();
+});
+
+document.getElementById('logout-btn').addEventListener('click', function() {
+  db.auth.signOut().then(function() { window.location.href = 'auth.html'; });
+});
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function playSound(type) {
+  var ctx = getAudioCtx();
+  var freqs = { bell: [880, 660, 440], chime: [1047, 1319, 1568], beep: [880, 880, 880] };
+  var sequence = freqs[type] || freqs.bell;
+  sequence.forEach(function(freq, i) {
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.frequency.value = freq;
+    osc.type = type === 'beep' ? 'square' : 'sine';
+    gain.gain.setValueAtTime(0.4, ctx.currentTime + i * 0.4);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.4 + 0.35);
+    osc.start(ctx.currentTime + i * 0.4);
+    osc.stop(ctx.currentTime + i * 0.4 + 0.35);
+  });
+}
+
+function checkAlarms() {
+  var now = new Date();
+  var hh = String(now.getHours()).padStart(2, '0');
+  var mm = String(now.getMinutes()).padStart(2, '0');
+  var currentTime = hh + ':' + mm;
+  var dayOfWeek = now.getDay();
+  var todayStr = now.toISOString().split('T')[0];
+
+  allAlarms.forEach(function(alarm) {
+    if (!alarm.active) return;
+    if (alarm.time !== currentTime) return;
+    var fireKey = alarm.id + '_' + todayStr + '_' + currentTime;
+    if (firedToday[fireKey]) return;
+
+    var shouldFire = false;
+    if (alarm.repeat === 'once') shouldFire = true;
+    else if (alarm.repeat === 'daily') shouldFire = true;
+    else if (alarm.repeat === 'weekdays' && dayOfWeek >= 1 && dayOfWeek <= 5) shouldFire = true;
+    else if (alarm.repeat === 'weekends' && (dayOfWeek === 0 || dayOfWeek === 6)) shouldFire = true;
+
+    if (shouldFire) {
+      firedToday[fireKey] = true;
+      ringAlarm(alarm);
+      if (alarm.repeat === 'once') {
+        db.from('alarms').update({ active: false }).eq('id', alarm.id).then(function() { loadAlarms(); });
+      }
+    }
+  });
+}
+
+function ringAlarm(alarm) {
+  document.getElementById('ringing-time').textContent = alarm.time;
+  document.getElementById('ringing-label').textContent = alarm.label || 'Alarm';
+  document.getElementById('ringing-overlay').classList.remove('hidden');
+  playSound(alarm.sound || 'bell');
+  ringInterval = setInterval(function() { playSound(alarm.sound || 'bell'); }, 3000);
+}
+
+document.getElementById('dismiss-alarm-btn').addEventListener('click', function() {
+  document.getElementById('ringing-overlay').classList.add('hidden');
+  if (ringInterval) { clearInterval(ringInterval); ringInterval = null; }
+});
+
+function loadAlarms() {
+  db.from('alarms').select('*').eq('user_id', currentUser.id).order('time').then(function(result) {
+    allAlarms = result.data || [];
+    renderAlarms();
+  });
+}
+
+function renderAlarms() {
+  var container = document.getElementById('alarm-list');
+  if (allAlarms.length === 0) {
+    container.innerHTML = '<div class="empty-state">No alarms set yet. Add one above.</div>';
+    return;
+  }
+  container.innerHTML = '';
+  allAlarms.forEach(function(alarm) {
+    var div = document.createElement('div');
+    div.className = 'alarm-item' + (alarm.active ? '' : ' inactive');
+    div.innerHTML =
+      '<div class="alarm-time-display">' + alarm.time + '</div>' +
+      '<div class="alarm-info">' +
+        '<div class="alarm-label">' + (alarm.label || 'Alarm') + '</div>' +
+        '<div class="alarm-meta">' + formatRepeat(alarm.repeat) + ' · ' + (alarm.sound || 'bell') + '</div>' +
+      '</div>' +
+      '<div class="alarm-actions">' +
+        '<label class="toggle-switch">' +
+          '<input type="checkbox" ' + (alarm.active ? 'checked' : '') + ' data-id="' + alarm.id + '">' +
+          '<div class="toggle-track"></div>' +
+        '</label>' +
+        '<button class="alarm-delete" data-id="' + alarm.id + '">✕</button>' +
+      '</div>';
+    container.appendChild(div);
+  });
+
+  container.querySelectorAll('.toggle-switch input').forEach(function(toggle) {
+    toggle.addEventListener('change', function() {
+      db.from('alarms').update({ active: toggle.checked }).eq('id', toggle.dataset.id).then(function() { loadAlarms(); });
+    });
+  });
+  container.querySelectorAll('.alarm-delete').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      db.from('alarms').delete().eq('id', btn.dataset.id).then(function() { loadAlarms(); });
+    });
+  });
+}
+
+function formatRepeat(repeat) {
+  var map = { once: 'One time', daily: 'Every day', weekdays: 'Weekdays', weekends: 'Weekends' };
+  return map[repeat] || repeat;
+}
+
+document.getElementById('save-alarm-btn').addEventListener('click', function() {
+  var label = document.getElementById('alarm-label-input').value.trim();
+  var time = document.getElementById('alarm-time-input').value;
+  var repeat = document.getElementById('alarm-repeat-input').value;
+  var sound = document.getElementById('alarm-sound-input').value;
+  if (!time) { alert('Please set a time for the alarm.'); return; }
+  db.from('alarms').insert({
+    user_id: currentUser.id,
+    label: label || 'Alarm',
+    time: time,
+    repeat: repeat,
+    sound: sound,
+    active: true,
+    created_at: new Date().toISOString()
+  }).then(function(result) {
+    if (!result.error) {
+      document.getElementById('alarm-label-input').value = '';
+      document.getElementById('alarm-time-input').value = '';
+      loadAlarms();
+    }
+  });
+});
+</script>
+
+<script src="js/main.js"></script>
+</body>
+</html>
