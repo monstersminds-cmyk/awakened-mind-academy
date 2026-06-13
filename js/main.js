@@ -37,18 +37,34 @@ el.remove();
 
 if (session) {
 
+  // Dashboard
   if (!nav.querySelector('a[href*="dashboard.html"]')) {
-    var dashboardBtn = document.createElement('a');
-    dashboardBtn.href = root + 'dashboard.html';
-    dashboardBtn.className = 'btn btn-gold nav-auth-btn';
-    dashboardBtn.textContent = 'Dashboard';
-    nav.appendChild(dashboardBtn);
+    var dashLink = document.createElement('a');
+    dashLink.href = root + 'dashboard.html';
+    dashLink.className = 'nav-dashboard-btn';
+    dashLink.textContent = 'Dashboard';
+
+    var logoutBtn = nav.querySelector('#logout-btn');
+
+    if (logoutBtn) {
+      nav.insertBefore(dashLink, logoutBtn);
+    } else {
+      nav.appendChild(dashLink);
+    }
   }
 
-}
-```
+  // Profile
+  if (!nav.querySelector('a[href*="profile.html"]')) {
+    var profileBtn = document.createElement('a');
+    profileBtn.href = root + 'profile.html';
+    profileBtn.className = 'btn btn-gold nav-auth-btn';
+    profileBtn.style.cssText = 'font-size:0.8rem;padding:0.5rem 1.2rem;';
+    profileBtn.textContent = 'Profile';
 
-} else {
+    nav.appendChild(profileBtn);
+  }
+
+
 
 ```
 var getStartedBtn = document.createElement('a');
