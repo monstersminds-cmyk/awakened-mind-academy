@@ -64,15 +64,14 @@ if (session) {
     nav.appendChild(profileBtn);
   }
 
+} else {
 
+  var authBtn = document.createElement('a');
+  authBtn.href = root + 'auth.html';
+  authBtn.className = 'btn btn-gold nav-auth-btn';
+  authBtn.textContent = 'Register / Log In';
 
-```
-var getStartedBtn = document.createElement('a');
-getStartedBtn.href = root + 'auth.html';
-getStartedBtn.className = 'btn btn-gold nav-auth-btn';
-getStartedBtn.textContent = 'Get Started';
-nav.appendChild(getStartedBtn);
-```
+  nav.appendChild(authBtn);
 
 }
 });
