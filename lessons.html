@@ -214,7 +214,7 @@ function setupComments(lessonId) {
 }
 
 function loadComments(lessonId) {
-  db.from('lesson_comments').select('*, profiles(full_name)').eq('lesson_id', lessonId).order('created_at', { ascending: true }).then(function(result) {
+    db.from('lesson_comments').select('*').eq('lesson_id', lessonId)
     var comments = result.data || [];
     var list = document.getElementById('comments-list-' + lessonId);
     if (comments.length === 0) {
@@ -225,7 +225,7 @@ function loadComments(lessonId) {
     comments.forEach(function(c) {
       var div = document.createElement('div');
       div.className = 'comment-item';
-      var name = (c.profiles && c.profiles.full_name) ? c.profiles.full_name : 'Anonymous';
+      var name = 'Member';
       div.innerHTML =
         '<div class="comment-author">' + name + '</div>' +
         '<div class="comment-text">' + c.content + '</div>' +
