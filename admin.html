@@ -175,7 +175,9 @@ db.auth.getSession().then(function(result) {
     var isAdmin = rows && rows.length > 0 && rows[0].is_admin === true;
     if (!isAdmin) {
       document.getElementById('access-denied').classList.remove('hidden');
+      document.getElementById('admin-content').classList.add('hidden');
     } else {
+      document.getElementById('access-denied').classList.add('hidden');
       document.getElementById('admin-content').classList.remove('hidden');
       loadAdminBooks();
     }
