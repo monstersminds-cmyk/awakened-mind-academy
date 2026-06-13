@@ -15,42 +15,48 @@ if (hamburger) {
   });
 }
 
-// Smart nav — runs on every page automatically
+// Work out if we are in the /pages/ subfolder
+var inSubfolder = window.location.pathname.includes('/pages/');
+var root = inSubfolder ? '../' : '';
+
+// Smart nav
 db.auth.getSession().then(function(result) {
   var session = result.data.session;
   var nav = document.querySelector('.nav-links');
   if (!nav) return;
 
-  // Remove any existing get-started or login buttons
-  var existing = nav.querySelector('.nav-auth-btn');
-  if (existing) existing.remove();
+  // Remove ALL existing auth-related buttons and dashboard links injected before
+  nav.querySelectorAll('.nav-auth-btn, .nav-dashboard-btn').forEach(function(el) { el.remove(); });
 
   if (session) {
-    // User is logged in — add Dashboard link and Profile button
-    // Only add Dashboard link if not already in nav
-    if (!nav.querySelector('a[href="dashboard.html"], a[href="../dashboard.html"]')) {
-      var dashLink = document.createElement('a');
-      dashLink.href = window.location.pathname.includes('/pages/') ? '../dashboard.html' : 'dashboard.html';
-      dashLink.textContent = 'Dashboard';
-      // Insert before the last child (hamburger button area)
-      nav.insertBefore(dashLink, nav.querySelector('button:not(.nav-auth-btn)'));
-    }
-    // Add Profile button
+    // Logged in — show Dashboard link + Profile button, no Get Started
+    var dashLink = document.createElement('a');
+    dashLink.href = root + 'dashboard.html';
+    dashLink.className = 'nav-dashboard-btn';
+    dashLink.textContent = 'Dashboard';
+
     var profileBtn = document.createElement('a');
-    profileBtn.href = window.location.pathname.includes('/pages/') ? '../profile.html' : 'profile.html';
+    profileBtn.href = root + 'profile.html';
     profileBtn.className = 'btn btn-gold nav-auth-btn';
-    profileBtn.style.fontSize = '0.8rem';
-    profileBtn.style.padding = '0.5rem 1.2rem';
+    profileBtn.style.cssText = 'font-size:0.8rem;padding:0.5rem 1.2rem;';
     profileBtn.textContent = 'Profile';
+
+    // Insert Dashboard before any logout button, otherwise at end
+    var logoutBtn = nav.querySelector('#logout-btn');
+    if (logoutBtn) {
+      nav.insertBefore(dashLink, logoutBtn);
+    } else {
+      nav.appendChild(dashLink);
+    }
     nav.appendChild(profileBtn);
+
   } else {
-    // User is not logged in — add Get Started button
-    var getStartedBtn = document.createElement('a');
-    getStartedBtn.href = window.location.pathname.includes('/pages/') ? '../auth.html' : 'auth.html';
-    getStartedBtn.className = 'btn btn-gold nav-auth-btn';
-    getStartedBtn.style.fontSize = '0.8rem';
-    getStartedBtn.style.padding = '0.5rem 1.2rem';
-    getStartedBtn.textContent = 'Get Started';
-    nav.appendChild(getStartedBtn);
+    // Not logged in — show Get Started only, no Dashboard
+    var getStarted = document.createElement('a');
+    getStarted.href = root + 'auth.html';
+    getStarted.className = 'btn btn-gold nav-auth-btn';
+    getStarted.style.cssText = 'font-size:0.8rem;padding:0.5rem 1.2rem;';
+    getStarted.textContent = 'Get Started';
+    nav.appendChild(getStarted);
   }
 });
