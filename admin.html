@@ -170,8 +170,10 @@ db.auth.getSession().then(function(result) {
   if (!session) { window.location.href = 'auth.html'; return; }
   currentUser = session.user;
 
-  db.from('profiles').select('is_admin').eq('id', currentUser.id).single().then(function(result) {
-    if (!result.data || !result.data.is_admin) {
+  db.from('profiles').select('is_admin').eq('id', currentUser.id).then(function(result) {
+    var rows = result.data;
+    var isAdmin = rows && rows.length > 0 && rows[0].is_admin === true;
+    if (!isAdmin) {
       document.getElementById('access-denied').classList.remove('hidden');
     } else {
       document.getElementById('admin-content').classList.remove('hidden');
@@ -179,7 +181,6 @@ db.auth.getSession().then(function(result) {
     }
   });
 });
-
 document.getElementById('logout-btn').addEventListener('click', function() {
   db.auth.signOut().then(function() { window.location.href = 'auth.html'; });
 });
