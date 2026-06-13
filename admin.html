@@ -77,9 +77,11 @@
 
   <div id="admin-content" style="display:none;">
     <div class="admin-tabs">
-      <button class="admin-tab active" data-tab="add">Add New Book</button>
-      <button class="admin-tab" data-tab="manage">Manage Books</button>
-    </div>
+        <button class="admin-tab active" data-tab="add">Add Book</button>
+        <button class="admin-tab" data-tab="manage">Manage Books</button>
+        <button class="admin-tab" data-tab="video">Add Video</button>
+        <button class="admin-tab" data-tab="manage-videos">Manage Videos</button>
+      </div>
 
     <div class="tab-panel active" id="tab-add">
       <div class="admin-message" id="add-message"></div>
@@ -139,12 +141,63 @@
     </div>
 
     <div class="tab-panel" id="tab-manage">
-      <div class="admin-message" id="manage-message"></div>
-      <div class="books-list" id="admin-books-list">
-        <div class="empty-state">Loading books...</div>
+        <div class="admin-message" id="manage-message"></div>
+        <div class="books-list" id="admin-books-list">
+          <div class="empty-state">Loading books...</div>
+        </div>
+      </div>
+  
+      <!-- ADD VIDEO TAB -->
+      <div class="tab-panel" id="tab-video">
+        <div class="admin-message" id="video-message"></div>
+        <div class="admin-form">
+          <h3>Video Details</h3>
+          <div class="form-grid">
+            <div class="form-group form-full">
+              <label>Video Title</label>
+              <input type="text" id="video-title" placeholder="e.g. How to Break Bad Habits">
+            </div>
+            <div class="form-group form-full">
+              <label>YouTube URL</label>
+              <input type="text" id="video-url" placeholder="e.g. https://www.youtube.com/watch?v=...">
+            </div>
+            <div class="form-group form-full">
+              <label>Description</label>
+              <textarea id="video-desc" placeholder="What will the student learn from this lesson..."></textarea>
+            </div>
+            <div class="form-group">
+              <label>Access</label>
+              <select id="video-paid">
+                <option value="false">Free — all logged in clients</option>
+                <option value="true">Paid — requires payment</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Price (if paid)</label>
+              <input type="text" id="video-price" placeholder="e.g. KSh 200" value="KSh 200">
+            </div>
+            <div class="form-group">
+              <label>Published</label>
+              <select id="video-published">
+                <option value="true">Yes — visible to clients</option>
+                <option value="false">No — hidden draft</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-top:1.5rem;">
+            <button class="btn btn-gold" id="save-video-btn" style="width:100%;padding:0.9rem;">Save Video Lesson</button>
+          </div>
+        </div>
+      </div>
+  
+      <!-- MANAGE VIDEOS TAB -->
+      <div class="tab-panel" id="tab-manage-videos">
+        <div class="admin-message" id="manage-videos-message"></div>
+        <div class="books-list" id="admin-videos-list">
+          <div class="empty-state">Loading videos...</div>
+        </div>
       </div>
     </div>
-  </div>
 
 </div>
 
@@ -192,6 +245,7 @@ document.querySelectorAll('.admin-tab').forEach(function(btn) {
     btn.classList.add('active');
     document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
     if (btn.dataset.tab === 'manage') loadAdminBooks();
+    if (btn.dataset.tab === 'manage-videos') loadAdminVideos();
   });
 });
 
@@ -329,6 +383,89 @@ function loadAdminBooks() {
         if (!confirm('Delete this book permanently? This cannot be undone.')) return;
         db.from('books').delete().eq('id', btn.dataset.id).then(function() {
           loadAdminBooks();
+        });
+      });
+    });
+  });
+}
+document.getElementById('save-video-btn').addEventListener('click', function() {
+  var title = document.getElementById('video-title').value.trim();
+  var url = document.getElementById('video-url').value.trim();
+  var desc = document.getElementById('video-desc').value.trim();
+  var isPaid = document.getElementById('video-paid').value === 'true';
+  var price = document.getElementById('video-price').value.trim();
+  var published = document.getElementById('video-published').value === 'true';
+
+  if (!title) { showMessage('video-message', 'Please enter a video title.', 'error'); return; }
+  if (!url) { showMessage('video-message', 'Please enter a YouTube URL.', 'error'); return; }
+
+  var btn = document.getElementById('save-video-btn');
+  btn.textContent = 'Saving...';
+  btn.disabled = true;
+
+  db.from('videos').insert({
+    title: title,
+    youtube_url: url,
+    description: desc,
+    is_paid: isPaid,
+    price: price,
+    published: published,
+    created_at: new Date().toISOString()
+  }).then(function(result) {
+    btn.textContent = 'Save Video Lesson';
+    btn.disabled = false;
+    if (result.error) {
+      showMessage('video-message', 'Error saving video: ' + result.error.message, 'error');
+      return;
+    }
+    showMessage('video-message', 'Video saved successfully.', 'success');
+    document.getElementById('video-title').value = '';
+    document.getElementById('video-url').value = '';
+    document.getElementById('video-desc').value = '';
+  });
+});
+
+function loadAdminVideos() {
+  db.from('videos').select('*').order('created_at', { ascending: false }).then(function(result) {
+    var videos = result.data || [];
+    var container = document.getElementById('admin-videos-list');
+    if (videos.length === 0) {
+      container.innerHTML = '<div class="empty-state">No videos yet. Add your first video in the Add Video tab.</div>';
+      return;
+    }
+    container.innerHTML = '';
+    videos.forEach(function(video) {
+      var div = document.createElement('div');
+      div.className = 'book-admin-item';
+      div.innerHTML =
+        '<div style="font-size:2rem;flex-shrink:0;">🎥</div>' +
+        '<div class="book-admin-info">' +
+          '<div class="book-admin-title">' + video.title + '</div>' +
+          '<div class="book-admin-price">' + (video.is_paid ? (video.price || 'KSh 200') + ' — Paid' : 'Free') + '</div>' +
+        '</div>' +
+        '<div class="book-admin-actions">' +
+          '<button class="publish-toggle ' + (video.published ? '' : 'unpublished') + '" data-id="' + video.id + '" data-published="' + video.published + '">' +
+            (video.published ? 'Published' : 'Hidden') +
+          '</button>' +
+          '<button class="btn-danger delete-video-btn" data-id="' + video.id + '">Delete</button>' +
+        '</div>';
+      container.appendChild(div);
+    });
+
+    container.querySelectorAll('.publish-toggle').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var newState = btn.dataset.published === 'true' ? false : true;
+        db.from('videos').update({ published: newState }).eq('id', btn.dataset.id).then(function() {
+          loadAdminVideos();
+        });
+      });
+    });
+
+    container.querySelectorAll('.delete-video-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        if (!confirm('Delete this video permanently?')) return;
+        db.from('videos').delete().eq('id', btn.dataset.id).then(function() {
+          loadAdminVideos();
         });
       });
     });
