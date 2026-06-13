@@ -165,22 +165,24 @@ function showMessage(containerId, text, type) {
 }
 
 // Auth + admin check
-db.auth.getSession().then(function(result) {
-  var session = result.data.session;
-  if (!session) { window.location.href = 'auth.html'; return; }
-  currentUser = session.user;
+window.addEventListener('load', function() {
+  db.auth.getSession().then(function(result) {
+    var session = result.data.session;
+    if (!session) { window.location.href = 'auth.html'; return; }
+    currentUser = session.user;
 
-  db.from('profiles').select('is_admin').eq('id', currentUser.id).then(function(result) {
-    var rows = result.data;
-    var isAdmin = rows && rows.length > 0 && rows[0].is_admin === true;
-    if (!isAdmin) {
-      document.getElementById('access-denied').classList.remove('hidden');
-      document.getElementById('admin-content').classList.add('hidden');
-    } else {
-      document.getElementById('access-denied').classList.add('hidden');
-      document.getElementById('admin-content').classList.remove('hidden');
-      loadAdminBooks();
-    }
+    db.from('profiles').select('is_admin').eq('id', currentUser.id).then(function(result) {
+      var rows = result.data;
+      var isAdmin = rows && rows.length > 0 && rows[0].is_admin === true;
+      if (!isAdmin) {
+        document.getElementById('access-denied').classList.remove('hidden');
+        document.getElementById('admin-content').classList.add('hidden');
+      } else {
+        document.getElementById('access-denied').classList.add('hidden');
+        document.getElementById('admin-content').classList.remove('hidden');
+        loadAdminBooks();
+      }
+    });
   });
 });
 document.getElementById('logout-btn').addEventListener('click', function() {
