@@ -162,6 +162,11 @@
       <h3>Book a Session</h3>
       <p>Ready to go deeper? Book a one-on-one coaching session with Professor Kungu.</p>
     </a>
+    <a href="admin.html" class="dash-card" id="admin-card" style="display:none;border-color:rgba(201,168,76,0.35);">
+      <div class="dash-card-icon">⚙️</div>
+      <h3 style="color:var(--gold);">Admin Panel</h3>
+      <p>Upload books, manage videos, and control content across the app.</p>
+    </a>
   </div>
 </div>
 
@@ -339,6 +344,14 @@ function initDashboard() {
     db.from('habits').select('*').eq('user_id', currentUser.id).then(function(res) {
       allHabits = res.data || [];
       loadHabitsSummary();
+      db.from('profiles').select('is_admin').eq('id', currentUser.id).then(function(res) {
+  var rows = res.data;
+  var isAdmin = rows && rows.length > 0 && rows[0].is_admin === true;
+  if (isAdmin) {
+    var adminCard = document.getElementById('admin-card');
+    if (adminCard) adminCard.style.display = 'block';
+  }
+});
       loadFeatured();
     });
 
