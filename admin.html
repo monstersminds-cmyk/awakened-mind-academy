@@ -43,7 +43,6 @@
     .book-admin-actions{display:flex;gap:0.5rem;flex-wrap:wrap}
     .btn-danger{background:rgba(255,80,80,0.1);border:1px solid #ff5050;color:#ff5050;border-radius:var(--radius);padding:0.4rem 0.9rem;font-size:0.78rem;cursor:pointer;font-family:Inter,sans-serif}
     .btn-danger:hover{background:rgba(255,80,80,0.2)}
-    .btn-sm{font-size:0.78rem;padding:0.4rem 0.9rem}
     .publish-toggle{font-size:0.75rem;padding:0.3rem 0.7rem;border-radius:20px;border:1px solid rgba(201,168,76,0.3);background:rgba(201,168,76,0.08);color:var(--gold);cursor:pointer;font-family:Inter,sans-serif}
     .publish-toggle.unpublished{border-color:rgba(255,80,80,0.3);background:rgba(255,80,80,0.08);color:#ff5050}
     .empty-state{text-align:center;padding:3rem;color:var(--text-dim);font-size:0.9rem}
@@ -70,7 +69,7 @@
     <h1 class="section-title">Manage Books</h1>
   </div>
 
-  <div id="access-denied" style="display:none;text-align:center;padding:4rem 1rem;"></div>
+  <div id="access-denied" style="display:none;text-align:center;padding:4rem 1rem;">
     <h2 style="color:#ff5050;margin-bottom:1rem;">Access Denied</h2>
     <p style="color:var(--text-dim);">This page is for administrators only.</p>
     <a href="dashboard.html" class="btn btn-gold" style="margin-top:1.5rem;display:inline-block;">Back to Dashboard</a>
@@ -82,7 +81,6 @@
       <button class="admin-tab" data-tab="manage">Manage Books</button>
     </div>
 
-    <!-- ADD BOOK TAB -->
     <div class="tab-panel active" id="tab-add">
       <div class="admin-message" id="add-message"></div>
       <div class="admin-form">
@@ -113,7 +111,7 @@
           </div>
           <div class="form-group">
             <label>Front Cover Image</label>
-            <div class="upload-box" id="cover-upload-box">
+            <div class="upload-box">
               <input type="file" id="cover-file" accept="image/*">
               <div class="upload-icon">📖</div>
               <p>Click to upload front cover</p>
@@ -124,7 +122,7 @@
           </div>
           <div class="form-group">
             <label>Back Cover Image</label>
-            <div class="upload-box" id="backcover-upload-box">
+            <div class="upload-box">
               <input type="file" id="backcover-file" accept="image/*">
               <div class="upload-icon">📚</div>
               <p>Click to upload back cover</p>
@@ -140,7 +138,6 @@
       </div>
     </div>
 
-    <!-- MANAGE BOOKS TAB -->
     <div class="tab-panel" id="tab-manage">
       <div class="admin-message" id="manage-message"></div>
       <div class="books-list" id="admin-books-list">
@@ -148,13 +145,12 @@
       </div>
     </div>
   </div>
+
 </div>
 
 <script src="js/main.js"></script>
 <script>
 var currentUser = null;
-var coverUrl = null;
-var backcoverUrl = null;
 
 function showMessage(containerId, text, type) {
   var msg = document.getElementById(containerId);
@@ -164,7 +160,6 @@ function showMessage(containerId, text, type) {
   setTimeout(function() { msg.style.display = 'none'; }, 5000);
 }
 
-// Auth + admin check
 window.addEventListener('load', function() {
   db.auth.getSession().then(function(result) {
     var session = result.data.session;
@@ -185,11 +180,11 @@ window.addEventListener('load', function() {
     });
   });
 });
+
 document.getElementById('logout-btn').addEventListener('click', function() {
   db.auth.signOut().then(function() { window.location.href = 'auth.html'; });
 });
 
-// Tabs
 document.querySelectorAll('.admin-tab').forEach(function(btn) {
   btn.addEventListener('click', function() {
     document.querySelectorAll('.admin-tab').forEach(function(b) { b.classList.remove('active'); });
@@ -200,7 +195,6 @@ document.querySelectorAll('.admin-tab').forEach(function(btn) {
   });
 });
 
-// Image preview
 function setupImagePreview(inputId, previewId) {
   document.getElementById(inputId).addEventListener('change', function(e) {
     var file = e.target.files[0];
@@ -217,14 +211,12 @@ function setupImagePreview(inputId, previewId) {
 setupImagePreview('cover-file', 'cover-preview');
 setupImagePreview('backcover-file', 'backcover-preview');
 
-// Upload image to Supabase storage
 function uploadImage(file, filename, progressId, fillId) {
   return new Promise(function(resolve, reject) {
     var progress = document.getElementById(progressId);
     var fill = document.getElementById(fillId);
     progress.style.display = 'block';
     fill.style.width = '30%';
-
     var path = 'covers/' + Date.now() + '_' + filename;
     db.storage.from('book-covers').upload(path, file, { upsert: true }).then(function(result) {
       if (result.error) {
@@ -240,7 +232,6 @@ function uploadImage(file, filename, progressId, fillId) {
   });
 }
 
-// Save book
 document.getElementById('save-book-btn').addEventListener('click', function() {
   var title = document.getElementById('book-title').value.trim();
   var synopsis = document.getElementById('book-synopsis').value.trim();
@@ -264,16 +255,13 @@ document.getElementById('save-book-btn').addEventListener('click', function() {
     : Promise.resolve(null);
 
   Promise.all([coverPromise, backcoverPromise]).then(function(urls) {
-    var coverUrl = urls[0];
-    var backcoverUrl = urls[1];
-
     db.from('books').insert({
       title: title,
       synopsis: synopsis,
       preview: preview,
       price: price,
-      cover_url: coverUrl,
-      backcover_url: backcoverUrl,
+      cover_url: urls[0],
+      backcover_url: urls[1],
       published: published,
       created_at: new Date().toISOString()
     }).then(function(result) {
@@ -300,7 +288,6 @@ document.getElementById('save-book-btn').addEventListener('click', function() {
   });
 });
 
-// Load books for manage tab
 function loadAdminBooks() {
   db.from('books').select('*').order('created_at', { ascending: false }).then(function(result) {
     var books = result.data || [];
