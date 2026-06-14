@@ -11,6 +11,13 @@
   <meta property="og:title" content="Awakened Mind Academy">
   <meta property="og:description" content="Psychology-based coaching for discipline, clarity, and mental transformation.">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+  var _db = window.supabase.createClient('https://ffpppcbegvjskeujlqif.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZmcHBwY2JlZ3Zqc2tldWpscWlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExODM3MTQsImV4cCI6MjA5Njc1OTcxNH0.FZu3uNtxJ8KeYx-c2d79YC3ThKzC98W4Azaxzsoot2A');
+  _db.auth.getSession().then(function(r) {
+    if (r.data.session) window.location.href = 'app.html';
+  });
+</script>
 </head>
 <body>
 
