@@ -764,7 +764,7 @@ function loadFeedReactions(lessonId) {
     container.innerHTML = '';
     FEED_REACTIONS.forEach(function(r) {
       var count = reactions.filter(function(rx) { return rx.reaction === r.key; }).length;
-      var mine = reactions.find(function(rx) { return rx.user_id === currentUser.id && rx.reaction === r.key; });
+      var mine = !!reactions.find(function(rx) { return rx.user_id === currentUser.id && rx.reaction === r.key; });
       var btn = document.createElement('button');
       btn.className = 'feed-reaction-btn' + (mine ? ' active' : '');
       btn.textContent = r.emoji + (count > 0 ? ' ' + count : '');
