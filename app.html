@@ -282,134 +282,20 @@
   </div>
 </div>
 
-<!-- SCREEN CONTAINER -->
-<div class="screen-container" id="screen-container" style="display:none;">
-
-  <!-- TODAY SCREEN -->
-  <div class="screen active" id="screen-today">
-    <div id="completion-streak-banner" style="background:var(--bg2);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:0.6rem 1.2rem;font-size:0.82rem;font-weight:700;color:var(--gold);margin-bottom:1rem;text-align:center;width:100%;">Loading streak...</div>
-        <div id="completion-streak-banner" style="background:var(--bg2);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:0.6rem 1.2rem;font-size:0.82rem;font-weight:700;color:var(--gold);margin-bottom:1rem;text-align:center;width:100%;">Loading streak...</div>
-      <div class="today-greeting" id="today-greeting">Good morning</div>
-      <div class="today-name" id="today-name">Loading...</div>
-      <div class="big-circle-wrap">
-        <svg class="big-circle-svg" width="220" height="220" viewBox="0 0 220 220">
-          <circle class="big-circle-bg" cx="110" cy="110" r="95"/>
-          <circle class="big-circle-fill" id="big-circle-fill" cx="110" cy="110" r="95"
-            stroke-dasharray="596.9" stroke-dashoffset="596.9"/>
-        </svg>
-        <div class="big-circle-centre">
-          <div class="big-circle-percent" id="big-circle-percent">0%</div>
-          <div class="big-circle-sub">Daily Goal</div>
-          <div class="big-circle-streak" id="big-circle-streak"></div>
-        </div>
-      </div>
-      <div class="today-complete-msg" id="today-complete-msg">
-        <div class="complete-emoji">🎉</div>
-        <div class="complete-text">All done today!</div>
-        <div class="complete-sub">You crushed it. See you tomorrow.</div>
-      </div>
-    </div>
-
-    <div class="today-stats">
-      <div class="today-stat">
-        <div class="today-stat-num" id="stat-habits">0/0</div>
-        <div class="today-stat-label">Habits</div>
-      </div>
-      <div class="today-stat">
-        <div class="today-stat-num" id="stat-todos">0/0</div>
-        <div class="today-stat-label">To-Do</div>
-      </div>
-      <div class="today-stat">
-        <div class="today-stat-num" id="stat-avoided">0/0</div>
-        <div class="today-stat-label">Avoided</div>
-      </div>
-    </div>
-
-    <div class="today-section">
-      <div class="today-section-header">
-        <div class="today-section-title">🔥 Daily Habits</div>
-      </div>
-      <div id="today-habits-list"><div class="today-empty">No daily habits yet. Add them in Dashboard.</div></div>
-    </div>
-
-    <div class="today-section">
-      <div class="today-section-header">
-        <div class="today-section-title">✅ To-Do</div>
-      </div>
-      <div id="today-todos-list"><div class="today-empty">No tasks yet.</div></div>
-    </div>
-
-    <div class="today-section">
-      <div class="today-section-header">
-        <div class="today-section-title">🚫 Not-To-Do</div>
-      </div>
-      <div id="today-nottodos-list"><div class="today-empty">No avoidances yet.</div></div>
-    </div>
-  </div>
-
-  <!-- LEARN SCREEN -->
-  <div class="screen" id="screen-learn">
-    <div class="section-eyebrow">Feed</div>
-    <div class="screen-title" style="margin-bottom:1.2rem;">Learn</div>
-    <div id="learn-feed"><div class="empty-feed">Loading feed...</div></div>
-  </div>
-
-  <!-- BOOKS SCREEN -->
-  <div class="screen" id="screen-books">
-    <div class="section-eyebrow">Library</div>
-    <div class="screen-title" style="margin-bottom:1.2rem;">Books</div>
-    <div class="books-grid-app" id="books-grid-app"></div>
-  </div>
-
-  <!-- DASHBOARD SCREEN -->
-  <div class="screen" id="screen-dashboard">
-    <div class="section-eyebrow">Your Space</div>
-    <div class="screen-title" style="margin-bottom:1.2rem;">Dashboard</div>
-
-    <div class="dash-profile">
-      <div class="dash-avatar-big" id="dash-avatar-big">?</div>
-      <div class="dash-profile-info">
-        <h2 id="dash-profile-name">Loading...</h2>
-        <p id="dash-profile-email"></p>
-      </div>
-    </div>
-
-    <div class="dash-section-title">🔥 Your Top Streaks</div>
-    <div class="dash-streak-row" id="dash-streak-row">
-      <div class="dash-streak-card"><div class="dash-streak-num">—</div><div class="dash-streak-label">Loading</div></div>
-    </div>
-
-    <div class="dash-section-title" style="margin-bottom:0.8rem;">Your Tools</div>
-    <div class="dash-tools">
-      <a href="habits.html" class="dash-tool">
-        <div class="dash-tool-icon">⚙️</div>
-        <div class="dash-tool-name">Habits</div>
-        <div class="dash-tool-desc">Manage your habit list</div>
-      </a>
-      <a href="todo.html" class="dash-tool">
-        <div class="dash-tool-icon">✅</div>
-        <div class="dash-tool-name">To-Do List</div>
-        <div class="dash-tool-desc">Tasks and avoidances</div>
-      </a>
-      <a href="alarm.html" class="dash-tool">
-        <div class="dash-tool-icon">⏰</div>
-        <div class="dash-tool-name">Alarms</div>
-        <div class="dash-tool-desc">Set daily reminders</div>
-      </a>
-      <a href="profile.html" class="dash-tool">
-        <div class="dash-tool-icon">👤</div>
-        <div class="dash-tool-name">Profile</div>
-        <div class="dash-tool-desc">Update your details</div>
-      </a>
-      <a href="admin.html" class="dash-tool hidden" id="dash-admin-tool">
-        <div class="dash-tool-icon">⚙️</div>
-        <div class="dash-tool-name">Admin Panel</div>
-        <div class="dash-tool-desc">Manage content</div>
-      </a>
-    </div>
-
-    <button class="btn btn-outline dash-logout" id="app-logout-btn">Sign Out</button>
-  </div>
+function loadCompletionStreak() {
+    db.from('profiles').select('completion_streak, last_completed').eq('id', currentUser.id).single().then(function(result) {
+      var data = result.data || {};
+      var streak = data.completion_streak || 0;
+      document.getElementById('streak-circle-num').textContent = streak;
+      var max = Math.max(streak, 30);
+      var circumference = 314;
+      var offset = streak === 0 ? circumference : circumference - (Math.min(streak, max) / max) * circumference;
+      document.getElementById('streak-circle-fill').style.strokeDashoffset = offset;
+      document.getElementById('streak-circle-label').textContent = streak === 0
+        ? 'Complete all tasks to start your streak'
+        : '🔥 ' + streak + ' day' + (streak === 1 ? '' : 's') + ' in a row';
+    });
+}
 
   <!-- EVENTS SCREEN -->
   <div class="screen" id="screen-events">
