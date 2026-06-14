@@ -573,20 +573,7 @@ function initApp() {
   });
 }
 
-function updateCompletionStreak(pct) {
-  if (pct < 100) return;
-  db.from('profiles').select('completion_streak, last_completed').eq('id', currentUser.id).single().then(function(result) {
-    var data = result.data || {};
-    var today = todayStr;
-    if (data.last_completed === today) return;
-    var yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
-    var yesterdayStr = yesterday.toISOString().split('T')[0];
-    var newStreak = data.last_completed === yesterdayStr ? (data.completion_streak || 0) + 1 : 1;
-    db.from('profiles').update({ completion_streak: newStreak, last_completed: today }).eq('id', currentUser.id).then(function() {
-      loadCompletionStreak();
-    });
-  });
-}
+renderToday
     renderToday();
 loadDashStreaks();
 loadCompletionStreak();
@@ -677,6 +664,29 @@ function toggleTodayItem(id, type) {
 }
 
 // ── DASHBOARD STREAKS ──
+function loadCompletionStreak() {
+  db.from('profiles').select('completion_streak, last_completed').eq('id', currentUser.id).single().then(function(result) {
+    var data = result.data || {};
+    var streak = data.completion_streak || 0;
+    var el = document.getElementById('completion-streak-banner');
+    if (el) el.textContent = streak === 0 ? 'Start your streak today' : '🔥 ' + streak + ' day' + (streak === 1 ? '' : 's') + ' complete streak';
+  });
+}
+
+function updateCompletionStreak(pct) {
+  if (pct < 100) return;
+  db.from('profiles').select('completion_streak, last_completed').eq('id', currentUser.id).single().then(function(result) {
+    var data = result.data || {};
+    var today = todayStr;
+    if (data.last_completed === today) return;
+    var yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+    var yesterdayStr = yesterday.toISOString().split('T')[0];
+    var newStreak = data.last_completed === yesterdayStr ? (data.completion_streak || 0) + 1 : 1;
+    db.from('profiles').update({ completion_streak: newStreak, last_completed: today }).eq('id', currentUser.id).then(function() {
+      loadCompletionStreak();
+    });
+  });
+}
 function loadDashStreaks() {
   db.from('featured_habits').select('slot, habits(*)').eq('user_id', currentUser.id).order('slot').then(function(result) {
     var featured = result.data || [];
