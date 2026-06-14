@@ -781,7 +781,7 @@ function loadFeedReactions(lessonId) {
 }
 
 function loadFeedComments(lessonId) {
-  db.from('lesson_comments').select('*, profiles(full_name)').eq('lesson_id', lessonId).order('created_at', { ascending: true }).then(function(result) {
+  db.from('lesson_comments').select('*').eq('lesson_id', lessonId).order('created_at', { ascending: true }).then(function(result) {
     var comments = result.data || [];
     var list = document.getElementById('lcl-' + lessonId);
     if (!list) return;
@@ -790,7 +790,7 @@ function loadFeedComments(lessonId) {
     comments.forEach(function(c) {
       var div = document.createElement('div');
       div.className = 'feed-comment';
-      div.innerHTML = '<div class="feed-comment-author">' + ((c.profiles && c.profiles.full_name) || 'Anonymous') + '</div><div class="feed-comment-text">' + c.content + '</div>';
+      div.innerHTML = '<div class="feed-comment-author">Member</div><div class="feed-comment-text">' + c.content + '</div>';
       list.appendChild(div);
     });
   });
@@ -928,22 +928,25 @@ function loadEvents() {
     myRsvps = (rsvpRes.data || []).map(function(r) { return r.event_id; });
     db.from('events').select('*').eq('published', true).order('event_date', { ascending: true }).then(function(result) {
       allEvents = result.data || [];
-      if (allEvents.length === 0) { feed.innerHTML = '<div class="empty-feed">No upcoming events.</div>'; return; }
+      if (allEvents.length === 0) { feed.innerHTML = '<div class="empty-feed"No upcoming events.</div>'; return; }
       feed.innerHTML = '';
       allEvents.forEach(function(event) {
         var d = new Date(event.event_date);
-        var isRsvped = myRsvps.indexOf(event.id) !== -1;
+var today = new Date(); today.setHours(0,0,0,0);
+var eventDay = new Date(event.event_date); eventDay.setHours(0,0,0,0);
+var isPast = eventDay < today;
+var isRsvped = myRsvps.indexOf(event.id) !== -1;
         var div = document.createElement('div');
         div.className = 'event-card-app';
-        var rsvpClass = event.is_paid ? 'paid-rsvp' : (isRsvped ? 'rsvped' : 'free-rsvp');
-        var rsvpText = event.is_paid ? '🎟️ Get Ticket' : (isRsvped ? '✓ Going' : 'RSVP');
+        var rsvpClass = isPast ? 'rsvped' : (event.is_paid ? 'paid-rsvp' : (isRsvped ? 'rsvped' : 'free-rsvp'));
+var rsvpText = isPast ? 'Ended' : (event.is_paid ? '🎟️ Get Ticket' : (isRsvped ? '✓ Going' : 'RSVP'));
         div.innerHTML =
           '<div class="event-date-pill">' +
             '<div class="event-date-day">' + d.getDate() + '</div>' +
             '<div class="event-date-mon">' + d.toLocaleDateString('en-KE',{month:'short'}).toUpperCase() + '</div>' +
           '</div>' +
           '<div class="event-info-app">' +
-            '<span class="event-badge-app ' + (event.is_paid ? 'paid' : 'free') + '">' + (event.is_paid ? 'Paid · ' + (event.price || 'KSh 200') : 'Free') + '</span>' +
+            '<span class="event-badge-app ' + (isPast ? 'paid' : (event.is_paid ? 'paid' : 'free')) + '">' + (isPast ? 'Event Over' : (event.is_paid ? 'Paid · ' + (event.price || 'KSh 200') : 'Free')) + '</span>' +
             '<div class="event-title-app">' + event.title + '</div>' +
             '<div class="event-desc-app">' + (event.description || '') + '</div>' +
             '<div class="event-meta-app">' +
