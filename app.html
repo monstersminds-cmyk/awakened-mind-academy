@@ -288,6 +288,7 @@
   <!-- TODAY SCREEN -->
   <div class="screen active" id="screen-today">
     <div class="today-hero">
+        <div id="completion-streak-banner" style="background:var(--bg2);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:0.6rem 1.2rem;font-size:0.82rem;font-weight:700;color:var(--gold);margin-bottom:1rem;text-align:center;width:100%;">Loading streak...</div>
       <div class="today-greeting" id="today-greeting">Good morning</div>
       <div class="today-name" id="today-name">Loading...</div>
       <div class="big-circle-wrap">
@@ -563,9 +564,32 @@ function initApp() {
     } else {
       dashAv.textContent = name.charAt(0).toUpperCase();
     }
+    function loadCompletionStreak() {
+  db.from('profiles').select('completion_streak, last_completed').eq('id', currentUser.id).single().then(function(result) {
+    var data = result.data || {};
+    var streak = data.completion_streak || 0;
+    var el = document.getElementById('completion-streak-banner');
+    if (el) el.textContent = streak === 0 ? 'Start your streak today' : '🔥 ' + streak + ' day' + (streak === 1 ? '' : 's') + ' complete streak';
+  });
+}
 
+function updateCompletionStreak(pct) {
+  if (pct < 100) return;
+  db.from('profiles').select('completion_streak, last_completed').eq('id', currentUser.id).single().then(function(result) {
+    var data = result.data || {};
+    var today = todayStr;
+    if (data.last_completed === today) return;
+    var yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+    var yesterdayStr = yesterday.toISOString().split('T')[0];
+    var newStreak = data.last_completed === yesterdayStr ? (data.completion_streak || 0) + 1 : 1;
+    db.from('profiles').update({ completion_streak: newStreak, last_completed: today }).eq('id', currentUser.id).then(function() {
+      loadCompletionStreak();
+    });
+  });
+}
     renderToday();
-    loadDashStreaks();
+loadDashStreaks();
+loadCompletionStreak();
 
     document.getElementById('app-loading').style.display = 'none';
     document.getElementById('top-bar').style.display = 'flex';
@@ -599,10 +623,10 @@ function renderToday() {
   fill.style.strokeDasharray = circumference;
   setTimeout(function() { fill.style.strokeDashoffset = offset; }, 100);
   if (pct === 100) {
-    fill.classList.add('complete');
-    document.getElementById('today-complete-msg').classList.add('show');
-  }
-
+  fill.classList.add('complete');
+  document.getElementById('today-complete-msg').classList.add('show');
+  updateCompletionStreak(pct);
+}
   renderTodayList('today-habits-list', dailyHabits, 'habit');
   renderTodayList('today-todos-list', todos, 'todo');
   renderTodayList('today-nottodos-list', notTodos, 'not-todo');
