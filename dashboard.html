@@ -23,10 +23,7 @@
     .dash-card-icon{font-size:2rem;margin-bottom:1rem}
     .dash-card h3{font-size:1rem;margin-bottom:0.4rem;color:var(--gold)}
     .dash-card p{font-size:0.85rem;color:var(--text-dim)}
-    .coming-soon{font-size:0.7rem;background:rgba(201,168,76,0.1);color:var(--gold);border:1px solid rgba(201,168,76,0.3);padding:0.2rem 0.6rem;border-radius:20px;display:inline-block;margin-top:0.6rem}
     .loading-text{color:var(--text-dim);font-size:0.9rem}
-
-    /* STREAK TRACKER */
     .streak-section{margin-bottom:2.5rem}
     .streak-section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem}
     .streak-section-header h3{font-size:0.78rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);margin:0}
@@ -49,13 +46,9 @@
     .empty-card-inner{display:flex;flex-direction:column;align-items:center;gap:0.5rem;color:var(--text-dim)}
     .empty-card-inner span{font-size:2rem}
     .empty-card-inner p{font-size:0.82rem;margin:0}
-
-    /* HABIT WIDGET */
     .habits-widget{background:var(--bg2);border:1px solid rgba(201,168,76,0.12);border-radius:var(--radius);padding:1.5rem;margin-bottom:2.5rem}
     .habits-widget-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
     .habits-widget-header h3{font-size:0.78rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);margin:0}
-
-    /* PICKER MODAL */
     .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;display:flex;align-items:center;justify-content:center;padding:1rem}
     .modal-box{background:var(--bg2);border:1px solid rgba(201,168,76,0.25);border-radius:var(--radius);padding:2rem;width:100%;max-width:500px;max-height:80vh;overflow-y:auto}
     .modal-box h3{font-size:1.1rem;color:var(--gold);margin-bottom:0.5rem}
@@ -87,7 +80,6 @@
 </nav>
 
 <div class="dashboard">
-
   <div class="profile-card">
     <div class="profile-card-avatar" id="dash-avatar">...</div>
     <div class="profile-card-info">
@@ -102,7 +94,6 @@
     </div>
   </div>
 
-  <!-- STREAK TRACKER -->
   <div class="streak-section">
     <div class="streak-section-header">
       <h3>🔥 Your Streak Tracker</h3>
@@ -113,7 +104,6 @@
     </div>
   </div>
 
-  <!-- HABITS SUMMARY WIDGET -->
   <div class="habits-widget">
     <div class="habits-widget-header">
       <h3>Today's Habits</h3>
@@ -128,7 +118,6 @@
     <p class="section-eyebrow">Your Tools</p>
     <h2 style="font-size:clamp(1.4rem,3vw,2rem);">What would you like to work on today?</h2>
   </div>
-
 
   <div class="dashboard-grid">
     <a href="habits.html" class="dash-card">
@@ -177,8 +166,8 @@
       <p>Upload books, manage videos, and control content across the app.</p>
     </a>
   </div>
+</div>
 
-<!-- HABIT PICKER MODAL -->
 <div class="modal-overlay hidden" id="picker-modal">
   <div class="modal-box">
     <h3>Choose a Featured Habit</h3>
@@ -190,6 +179,16 @@
     </div>
   </div>
 </div>
+
+<nav class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <a href="dashboard.html" class="bottom-nav-item active"><span>🏠</span><span>Home</span></a>
+    <a href="habits.html" class="bottom-nav-item"><span>⚙️</span><span>Habits</span></a>
+    <a href="lessons.html" class="bottom-nav-item"><span>📝</span><span>Lessons</span></a>
+    <a href="events.html" class="bottom-nav-item"><span>🗓️</span><span>Events</span></a>
+    <a href="profile.html" class="bottom-nav-item"><span>👤</span><span>Profile</span></a>
+  </div>
+</nav>
 
 <script>
 var SUPA_URL = 'https://ffpppcbegvjskeujlqif.supabase.co';
@@ -208,14 +207,11 @@ function buildCircleCard(habit) {
   var circumference = 2 * Math.PI * 54;
   var offset = circumference - (cycle / 30) * circumference;
   var isDoneToday = habit.last_done === todayStr;
-
   return '<div class="streak-card" data-id="' + habit.id + '">' +
     '<div class="circle-wrap">' +
       '<svg class="circle-svg" width="140" height="140" viewBox="0 0 120 120">' +
         '<circle class="circle-bg" cx="60" cy="60" r="54"/>' +
-        '<circle class="circle-fill" cx="60" cy="60" r="54" ' +
-          'stroke-dasharray="' + circumference + '" ' +
-          'stroke-dashoffset="' + offset + '"/>' +
+        '<circle class="circle-fill" cx="60" cy="60" r="54" stroke-dasharray="' + circumference + '" stroke-dashoffset="' + offset + '"/>' +
       '</svg>' +
       '<div class="circle-centre">' +
         '<div class="circle-number">' + streak + '</div>' +
@@ -224,20 +220,14 @@ function buildCircleCard(habit) {
     '</div>' +
     '<div class="streak-habit-name">' + habit.name + '</div>' +
     '<div class="streak-habit-type">' + habit.type + ' habit</div>' +
-    '<div class="streak-status' + (isDoneToday ? '' : ' missed') + '">' +
-      (isDoneToday ? '✓ Done today' : '○ Not done yet today') +
-    '</div>' +
+    '<div class="streak-status' + (isDoneToday ? '' : ' missed') + '">' + (isDoneToday ? '✓ Done today' : '○ Not done yet today') + '</div>' +
     '<button class="btn btn-outline" style="margin-top:1rem;font-size:0.75rem;padding:0.4rem 1rem;" onclick="openPicker(' + featuredHabits.indexOf(habit) + ')">Change</button>' +
   '</div>';
 }
 
 function buildEmptyCard(slotIndex) {
   return '<div class="streak-card empty-card" onclick="openPicker(' + slotIndex + ')">' +
-    '<div class="empty-card-inner">' +
-      '<span>＋</span>' +
-      '<p>Add a featured habit</p>' +
-      '<p style="font-size:0.75rem;">Tap to choose from your habits</p>' +
-    '</div>' +
+    '<div class="empty-card-inner"><span>＋</span><p>Add a featured habit</p><p style="font-size:0.75rem;">Tap to choose from your habits</p></div>' +
   '</div>';
 }
 
@@ -245,11 +235,7 @@ function renderStreakGrid() {
   var grid = document.getElementById('streak-grid');
   var html = '';
   for (var i = 0; i < 3; i++) {
-    if (featuredHabits[i]) {
-      html += buildCircleCard(featuredHabits[i]);
-    } else {
-      html += buildEmptyCard(i);
-    }
+    html += featuredHabits[i] ? buildCircleCard(featuredHabits[i]) : buildEmptyCard(i);
   }
   grid.innerHTML = html;
 }
@@ -265,13 +251,11 @@ function loadHabitsSummary() {
   var topStreaks = allHabits.slice().sort(function(a,b){ return (b.streak||0)-(a.streak||0); }).slice(0,3);
   var html = '<div style="background:var(--bg);border:1px solid rgba(201,168,76,0.15);border-radius:var(--radius);padding:1rem;grid-column:1/-1;">' +
     '<div style="font-size:1.4rem;font-weight:700;color:var(--gold);">' + done + ' / ' + total + '</div>' +
-    '<div style="font-size:0.78rem;color:var(--text-dim);margin-top:0.2rem;">habits completed today</div>' +
-    '</div>';
+    '<div style="font-size:0.78rem;color:var(--text-dim);margin-top:0.2rem;">habits completed today</div></div>';
   topStreaks.forEach(function(h) {
     html += '<div style="background:var(--bg);border:1px solid rgba(201,168,76,0.08);border-radius:var(--radius);padding:0.9rem 1rem;">' +
       '<div style="font-size:0.85rem;font-weight:500;margin-bottom:0.3rem;">' + h.name + '</div>' +
-      '<div style="font-size:0.78rem;color:var(--gold);">🔥 ' + (h.streak||0) + ' day streak</div>' +
-      '</div>';
+      '<div style="font-size:0.78rem;color:var(--gold);">🔥 ' + (h.streak||0) + ' day streak</div></div>';
   });
   container.innerHTML = html;
 }
@@ -281,9 +265,7 @@ function loadFeatured() {
     featuredHabits = [null, null, null];
     if (result.data) {
       result.data.forEach(function(row) {
-        if (row.slot >= 0 && row.slot < 3 && row.habits) {
-          featuredHabits[row.slot] = row.habits;
-        }
+        if (row.slot >= 0 && row.slot < 3 && row.habits) featuredHabits[row.slot] = row.habits;
       });
     }
     renderStreakGrid();
@@ -319,50 +301,31 @@ document.getElementById('modal-cancel-btn').addEventListener('click', function()
 });
 
 document.getElementById('modal-confirm-btn').addEventListener('click', function() {
-  if (!pickerSelected) {
-    document.getElementById('picker-modal').classList.add('hidden');
-    return;
-  }
-  db.from('featured_habits').upsert({
-    user_id: currentUser.id,
-    slot: pickerSlotIndex,
-    habit_id: pickerSelected.id
-  }, { onConflict: 'user_id,slot' }).then(function(result) {
-    if (!result.error) {
-      document.getElementById('picker-modal').classList.add('hidden');
-      loadFeatured();
-    }
+  if (!pickerSelected) { document.getElementById('picker-modal').classList.add('hidden'); return; }
+  db.from('featured_habits').upsert({ user_id: currentUser.id, slot: pickerSlotIndex, habit_id: pickerSelected.id }, { onConflict: 'user_id,slot' }).then(function(result) {
+    if (!result.error) { document.getElementById('picker-modal').classList.add('hidden'); loadFeatured(); }
   });
 });
 
 function initDashboard() {
-  try {
-    db = window.supabase.createClient(SUPA_URL, SUPA_KEY);
-  } catch(e) {
-    setTimeout(initDashboard, 500);
-    return;
-  }
-
+  try { db = window.supabase.createClient(SUPA_URL, SUPA_KEY); } catch(e) { setTimeout(initDashboard, 500); return; }
   db.auth.getSession().then(function(result) {
     var session = result.data.session;
     if (!session) { window.location.href = 'auth.html'; return; }
     currentUser = session.user;
     document.getElementById('dash-email').textContent = currentUser.email || '—';
-
     db.from('habits').select('*').eq('user_id', currentUser.id).then(function(res) {
       allHabits = res.data || [];
       loadHabitsSummary();
       db.from('profiles').select('is_admin').eq('id', currentUser.id).then(function(res) {
-  var rows = res.data;
-  var isAdmin = rows && rows.length > 0 && rows[0].is_admin === true;
-  if (isAdmin) {
-    var adminCard = document.getElementById('admin-card');
-    if (adminCard) adminCard.style.display = 'block';
-  }
-});
+        var rows = res.data;
+        if (rows && rows.length > 0 && rows[0].is_admin === true) {
+          var adminCard = document.getElementById('admin-card');
+          if (adminCard) adminCard.style.display = 'block';
+        }
+      });
       loadFeatured();
     });
-
     db.from('profiles').select('*').eq('id', currentUser.id).single().then(function(result) {
       var data = result.data;
       if (data) {
@@ -385,18 +348,12 @@ function initDashboard() {
       }
     });
   });
-
-  function doLogout() {
-    db.auth.signOut().then(function() { window.location.href = 'auth.html'; });
-  }
+  function doLogout() { db.auth.signOut().then(function() { window.location.href = 'auth.html'; }); }
   document.getElementById('logout-btn').addEventListener('click', doLogout);
   document.getElementById('logout-btn2').addEventListener('click', doLogout);
-
   var hamburger = document.querySelector('.hamburger');
   var navLinks = document.querySelector('.nav-links');
-  if (hamburger) {
-    hamburger.addEventListener('click', function() { navLinks.classList.toggle('open'); });
-  }
+  if (hamburger) hamburger.addEventListener('click', function() { navLinks.classList.toggle('open'); });
 }
 
 if (document.readyState === 'loading') {

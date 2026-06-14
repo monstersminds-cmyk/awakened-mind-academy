@@ -67,6 +67,16 @@
   </div>
 </div>
 
+<nav class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <a href="dashboard.html" class="bottom-nav-item"><span>🏠</span><span>Home</span></a>
+    <a href="habits.html" class="bottom-nav-item"><span>⚙️</span><span>Habits</span></a>
+    <a href="lessons.html" class="bottom-nav-item active"><span>📝</span><span>Lessons</span></a>
+    <a href="events.html" class="bottom-nav-item"><span>🗓️</span><span>Events</span></a>
+    <a href="profile.html" class="bottom-nav-item"><span>👤</span><span>Profile</span></a>
+  </div>
+</nav>
+
 <script src="js/main.js"></script>
 <script>
 var currentUser = null;
@@ -146,13 +156,8 @@ function setupReadMore(id) {
   var expanded = false;
   btn.addEventListener('click', function() {
     expanded = !expanded;
-    if (expanded) {
-      content.classList.add('expanded');
-      btn.textContent = 'Show less ↑';
-    } else {
-      content.classList.remove('expanded');
-      btn.textContent = 'Read more →';
-    }
+    if (expanded) { content.classList.add('expanded'); btn.textContent = 'Show less ↑'; }
+    else { content.classList.remove('expanded'); btn.textContent = 'Read more →'; }
   });
 }
 
@@ -175,13 +180,9 @@ function loadReactions(lessonId) {
 
 function toggleReaction(lessonId, reaction, alreadyReacted) {
   if (alreadyReacted) {
-    db.from('lesson_reactions').delete().eq('lesson_id', lessonId).eq('user_id', currentUser.id).eq('reaction', reaction).then(function() {
-      loadReactions(lessonId);
-    });
+    db.from('lesson_reactions').delete().eq('lesson_id', lessonId).eq('user_id', currentUser.id).eq('reaction', reaction).then(function() { loadReactions(lessonId); });
   } else {
-    db.from('lesson_reactions').upsert({ lesson_id: lessonId, user_id: currentUser.id, reaction: reaction }).then(function() {
-      loadReactions(lessonId);
-    });
+    db.from('lesson_reactions').upsert({ lesson_id: lessonId, user_id: currentUser.id, reaction: reaction }).then(function() { loadReactions(lessonId); });
   }
 }
 
@@ -191,21 +192,11 @@ function setupComments(lessonId) {
   var open = false;
   toggle.addEventListener('click', function() {
     open = !open;
-    if (open) {
-      area.classList.remove('hidden');
-      toggle.textContent = '💬 Hide comments';
-      loadComments(lessonId);
-    } else {
-      area.classList.add('hidden');
-      toggle.textContent = '💬 Show comments';
-    }
+    if (open) { area.classList.remove('hidden'); toggle.textContent = '💬 Hide comments'; loadComments(lessonId); }
+    else { area.classList.add('hidden'); toggle.textContent = '💬 Show comments'; }
   });
-  document.getElementById('comment-btn-' + lessonId).addEventListener('click', function() {
-    postComment(lessonId);
-  });
-  document.getElementById('comment-input-' + lessonId).addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') postComment(lessonId);
-  });
+  document.getElementById('comment-btn-' + lessonId).addEventListener('click', function() { postComment(lessonId); });
+  document.getElementById('comment-input-' + lessonId).addEventListener('keydown', function(e) { if (e.key === 'Enter') postComment(lessonId); });
 }
 
 function loadComments(lessonId) {
@@ -220,10 +211,7 @@ function loadComments(lessonId) {
     comments.forEach(function(c) {
       var div = document.createElement('div');
       div.className = 'comment-item';
-      div.innerHTML =
-        '<div class="comment-author">Member</div>' +
-        '<div class="comment-text">' + c.content + '</div>' +
-        '<div class="comment-time">' + formatDate(c.created_at) + '</div>';
+      div.innerHTML = '<div class="comment-author">Member</div><div class="comment-text">' + c.content + '</div><div class="comment-time">' + formatDate(c.created_at) + '</div>';
       list.appendChild(div);
     });
   });
@@ -233,16 +221,8 @@ function postComment(lessonId) {
   var input = document.getElementById('comment-input-' + lessonId);
   var text = input.value.trim();
   if (!text) return;
-  db.from('lesson_comments').insert({
-    lesson_id: lessonId,
-    user_id: currentUser.id,
-    content: text,
-    created_at: new Date().toISOString()
-  }).then(function(result) {
-    if (!result.error) {
-      input.value = '';
-      loadComments(lessonId);
-    }
+  db.from('lesson_comments').insert({ lesson_id: lessonId, user_id: currentUser.id, content: text, created_at: new Date().toISOString() }).then(function(result) {
+    if (!result.error) { input.value = ''; loadComments(lessonId); }
   });
 }
 </script>
