@@ -669,20 +669,22 @@ function loadFeedReactions(lessonId) {
       var btn = document.createElement('button');
       btn.className = 'feed-reaction-btn' + (mine ? ' active' : '');
       btn.textContent = r.emoji + (count > 0 ? ' ' + count : '');
-      btn.addEventListener('click', function() {
-        if (mine) {
-          db.from('lesson_reactions').delete().eq('lesson_id', lessonId).eq('user_id', currentUser.id).eq('reaction', r.key).then(function() { loadFeedReactions(lessonId); });
-        } else {
-          db.from('lesson_reactions').upsert({ lesson_id: lessonId, user_id: currentUser.id, reaction: r.key }).then(function() { loadFeedReactions(lessonId); });
-        }
-      });
+      (function(reactionKey, wasMine) {
+        btn.addEventListener('click', function() {
+          if (wasMine) {
+            db.from('lesson_reactions').delete().eq('lesson_id', lessonId).eq('user_id', currentUser.id).eq('reaction', reactionKey).then(function() { loadFeedReactions(lessonId); });
+          } else {
+            db.from('lesson_reactions').upsert({ lesson_id: lessonId, user_id: currentUser.id, reaction: reactionKey }).then(function() { loadFeedReactions(lessonId); });
+          }
+        });
+      })(r.key, mine);
       container.appendChild(btn);
     });
   });
 }
 
 function loadFeedComments(lessonId) {
-  db.from('lesson_comments').select('*, profiles(full_name)').eq('lesson_id', lessonId).order('created_at', { ascending: true }).then(function(result) {
+  db.from('lesson_comments').select('*').eq('lesson_id', lessonId).order('created_at', { ascending: true }).then(function(result) {
     var comments = result.data || [];
     var list = document.getElementById('lcl-' + lessonId);
     if (!list) return;
@@ -691,8 +693,7 @@ function loadFeedComments(lessonId) {
     comments.forEach(function(c) {
       var div = document.createElement('div');
       div.className = 'feed-comment';
-      var author = (c.profiles && c.profiles.full_name) ? c.profiles.full_name : 'Member';
-      div.innerHTML = '<div class="feed-comment-author">' + author + '</div><div class="feed-comment-text">' + c.content + '</div>';
+      div.innerHTML = '<div class="feed-comment-author">Member</div><div class="feed-comment-text">' + c.content + '</div>';
       list.appendChild(div);
     });
   });
