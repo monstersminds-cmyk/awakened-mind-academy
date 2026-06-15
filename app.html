@@ -276,7 +276,7 @@
   </div>
 
   <!-- LEARN -->
-  <div class="screen active" id="screen-learn">
+  <div class="screen" id="screen-learn">
     <div class="section-eyebrow">Feed</div>
     <div class="screen-title" style="margin-bottom:1.2rem;">Learn</div>
     <div id="learn-feed"><div class="empty-feed">Loading feed...</div></div>
@@ -323,13 +323,12 @@
   </div>
 
 </div>
-
 <!-- BOTTOM NAV -->
 <div class="bottom-nav" id="bottom-nav" style="display:none;">
-  <button class="nav-item" data-screen="learn"><div class="nav-item-icon">📚</div><div class="nav-label">Learn</div></button>
   <button class="nav-item" data-screen="books"><div class="nav-item-icon">📖</div><div class="nav-label">Books</div></button>
-  <button class="nav-item nav-item-learn active" data-screen="learn"><div class="nav-item-icon">🎯</div><div class="nav-label">Today</div></button>
-  <button class="nav-item" data-screen="dashboard"><div class="nav-item-icon">🏠</div><div class="nav-label">Dashboard</div></button>
+  <button class="nav-item" data-screen="today"><div class="nav-item-icon">🎯</div><div class="nav-label">Track</div></button>
+  <button class="nav-item nav-item-today active" data-screen="learn"><div class="nav-item-icon">🏠</div><div class="nav-label">Home</div></button>
+  <button class="nav-item" data-screen="dashboard"><div class="nav-item-icon">⚙️</div><div class="nav-label">Dashboard</div></button>
   <button class="nav-item" data-screen="events"><div class="nav-item-icon">🎉</div><div class="nav-label">Events</div></button>
 </div>
 
@@ -448,7 +447,7 @@ function initApp() {
 
     renderToday();
     loadCompletionStreak();
-    loadDashStreaks();
+    loadDashStreaks();loadLearn();
 
     document.getElementById('app-loading').style.display = 'none';
     document.getElementById('top-bar').style.display = 'flex';
