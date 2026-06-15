@@ -15,7 +15,7 @@
 <script>
   var _db = window.supabase.createClient('https://ffpppcbegvjskeujlqif.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZmcHBwY2JlZ3Zqc2tldWpscWlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExODM3MTQsImV4cCI6MjA5Njc1OTcxNH0.FZu3uNtxJ8KeYx-c2d79YC3ThKzC98W4Azaxzsoot2A');
   _db.auth.getSession().then(function(r) {
-    if (r.data.session) window.location.href = 'app.html';
+    if (r.data.session) window.location.href = 'app.html#learn';
   });
 </script>
 </head>
