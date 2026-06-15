@@ -7,81 +7,33 @@
   <link rel="icon" type="image/png" href="images/AWAKENED_LOGO2.png">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <style>
-    /* ── RESET & BASE ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg: #0a0a0a;
-      --bg2: #111111;
-      --bg3: #1a1a1a;
-      --gold: #c9a84c;
-      --gold-dim: rgba(201,168,76,0.15);
-      --white: #f5f5f5;
-      --text: #e0e0e0;
-      --text-dim: #888;
-      --radius: 14px;
-      --nav-h: 70px;
-      --top-h: 60px;
+      --bg: #0a0a0a; --bg2: #111111; --bg3: #1a1a1a;
+      --gold: #c9a84c; --gold-dim: rgba(201,168,76,0.15);
+      --white: #f5f5f5; --text: #e0e0e0; --text-dim: #888;
+      --radius: 14px; --nav-h: 70px; --top-h: 60px;
     }
     html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
-
-    /* ── TOP BAR ── */
-    .top-bar {
-      position: fixed; top: 0; left: 0; right: 0; height: var(--top-h);
-      background: var(--bg); border-bottom: 1px solid rgba(255,255,255,0.06);
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 1.2rem; z-index: 100;
-    }
+    .top-bar { position: fixed; top: 0; left: 0; right: 0; height: var(--top-h); background: var(--bg); border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: space-between; padding: 0 1.2rem; z-index: 100; }
     .top-bar-logo { font-size: 0.85rem; font-weight: 800; color: var(--gold); letter-spacing: 0.05em; text-transform: uppercase; }
-    .top-bar-right { display: flex; align-items: center; gap: 0.8rem; }
     .top-bar-avatar { width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid var(--gold); background: var(--bg3); display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; color: var(--gold); cursor: pointer; overflow: hidden; }
     .top-bar-avatar img { width: 100%; height: 100%; object-fit: cover; }
-
-    /* ── SCREEN CONTAINER ── */
-    .screen-container {
-      position: fixed; top: var(--top-h); left: 0; right: 0;
-      bottom: var(--nav-h); overflow-y: auto; overflow-x: hidden;
-      -webkit-overflow-scrolling: touch;
-    }
+    .screen-container { position: fixed; top: var(--top-h); left: 0; right: 0; bottom: var(--nav-h); overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
     .screen { display: none; min-height: 100%; padding: 1.5rem 1.2rem 2rem; animation: fadeIn 0.2s ease; }
     .screen.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-
-    /* ── BOTTOM NAV ── */
-    .bottom-nav {
-      position: fixed; bottom: 0; left: 0; right: 0; height: var(--nav-h);
-      background: #0d0d0d; border-top: 1px solid rgba(255,255,255,0.07);
-      display: flex; align-items: center; justify-content: space-around;
-      padding-bottom: env(safe-area-inset-bottom);
-      z-index: 100;
-    }
-    .nav-item {
-      display: flex; flex-direction: column; align-items: center; gap: 4px;
-      cursor: pointer; padding: 0.4rem 1rem; border-radius: 12px;
-      transition: all 0.2s; flex: 1; border: none; background: none;
-      color: var(--text-dim); font-family: inherit;
-    }
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: var(--nav-h); background: #0d0d0d; border-top: 1px solid rgba(255,255,255,0.07); display: flex; align-items: center; justify-content: space-around; padding-bottom: env(safe-area-inset-bottom); z-index: 100; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; padding: 0.4rem 1rem; border-radius: 12px; transition: all 0.2s; flex: 1; border: none; background: none; color: var(--text-dim); font-family: inherit; }
     .nav-item.active { color: var(--gold); }
-    .nav-item-icon {
-      width: 42px; height: 42px; border-radius: 12px; display: flex;
-      align-items: center; justify-content: center; font-size: 1.3rem;
-      transition: all 0.2s; background: transparent;
-    }
+    .nav-item-icon { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; transition: all 0.2s; background: transparent; }
     .nav-item.active .nav-item-icon { background: var(--gold-dim); }
-    .nav-item-today .nav-item-icon {
-      width: 52px; height: 52px; border-radius: 16px;
-      background: var(--gold); font-size: 1.5rem;
-      box-shadow: 0 4px 20px rgba(201,168,76,0.4);
-      margin-top: -12px;
-    }
+    .nav-item-today .nav-item-icon { width: 52px; height: 52px; border-radius: 16px; background: var(--gold); font-size: 1.5rem; box-shadow: 0 4px 20px rgba(201,168,76,0.4); margin-top: -12px; }
     .nav-item-today { color: var(--white); }
     .nav-item-today.active .nav-item-icon { background: var(--gold); box-shadow: 0 6px 24px rgba(201,168,76,0.6); }
     .nav-label { font-size: 0.62rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
-
-    /* ── SHARED COMPONENTS ── */
     .section-eyebrow { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.4rem; }
     .screen-title { font-size: 1.6rem; font-weight: 800; color: var(--white); margin-bottom: 0.3rem; line-height: 1.2; }
-    .card { background: var(--bg2); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius); padding: 1.2rem; }
-    .card-gold { border-color: rgba(201,168,76,0.2); }
     .btn { display: inline-flex; align-items: center; justify-content: center; border: none; border-radius: 10px; padding: 0.7rem 1.2rem; font-family: inherit; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; text-decoration: none; }
     .btn-gold { background: var(--gold); color: #0a0a0a; }
     .btn-gold:hover { opacity: 0.9; }
@@ -89,13 +41,11 @@
     .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
     .hidden { display: none !important; }
 
-    /* ── TODAY SCREEN ── */
-    .today-hero { display: flex; flex-direction: column; align-items: center; padding: 1.5rem 0 2rem; }
+    /* TODAY */
+    .today-hero { display: flex; flex-direction: column; align-items: center; padding: 1rem 0 1.5rem; }
     .today-greeting { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 0.3rem; text-align: center; }
-    .today-name { font-size: 1.1rem; font-weight: 700; color: var(--white); margin-bottom: 2rem; text-align: center; }
-
-    /* Big circle */
-    .big-circle-wrap { position: relative; width: 220px; height: 220px; margin-bottom: 1.5rem; }
+    .today-name { font-size: 1.1rem; font-weight: 700; color: var(--white); margin-bottom: 1.5rem; text-align: center; }
+    .big-circle-wrap { position: relative; width: 220px; height: 220px; margin-bottom: 1.2rem; }
     .big-circle-svg { transform: rotate(-90deg); }
     .big-circle-bg { fill: none; stroke: rgba(255,255,255,0.06); stroke-width: 12; }
     .big-circle-fill { fill: none; stroke: var(--gold); stroke-width: 12; stroke-linecap: round; transition: stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1); }
@@ -103,22 +53,17 @@
     .big-circle-centre { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; }
     .big-circle-percent { font-size: 2.8rem; font-weight: 900; color: var(--white); line-height: 1; }
     .big-circle-sub { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0.3rem; }
-    .big-circle-streak { font-size: 0.85rem; color: var(--gold); font-weight: 700; margin-top: 0.2rem; }
-
-    .today-complete-msg { display: none; text-align: center; margin-bottom: 1.5rem; }
+    .today-complete-msg { display: none; text-align: center; margin-bottom: 1rem; }
     .today-complete-msg.show { display: block; }
-    .complete-emoji { font-size: 2.5rem; margin-bottom: 0.4rem; }
+    .complete-emoji { font-size: 2rem; margin-bottom: 0.3rem; }
     .complete-text { font-size: 1rem; font-weight: 700; color: #4caf50; }
-    .complete-sub { font-size: 0.82rem; color: var(--text-dim); margin-top: 0.2rem; }
-
+    .complete-sub { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.2rem; }
     .today-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 0.8rem; margin-bottom: 1.5rem; width: 100%; }
     .today-stat { background: var(--bg2); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 0.9rem; text-align: center; }
     .today-stat-num { font-size: 1.5rem; font-weight: 800; color: var(--gold); }
     .today-stat-label { font-size: 0.65rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 0.2rem; }
-
     .today-section { width: 100%; margin-bottom: 1.2rem; }
-    .today-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.8rem; }
-    .today-section-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); }
+    .today-section-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); margin-bottom: 0.8rem; }
     .today-item { display: flex; align-items: center; gap: 0.9rem; background: var(--bg2); border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; padding: 0.9rem 1rem; margin-bottom: 0.5rem; transition: border-color 0.2s; }
     .today-item.done { border-color: rgba(201,168,76,0.25); opacity: 0.7; }
     .today-check { width: 24px; height: 24px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); background: none; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
@@ -130,7 +75,7 @@
     .today-item-name.done-text { text-decoration: line-through; }
     .today-empty { text-align: center; padding: 1.5rem; color: var(--text-dim); font-size: 0.82rem; }
 
-    /* ── LEARN SCREEN ── */
+    /* LEARN */
     .feed-item { margin-bottom: 1.5rem; }
     .feed-lesson { background: var(--bg2); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius); overflow: hidden; }
     .feed-lesson-photo { width: 100%; height: 200px; object-fit: cover; display: block; background: var(--bg3); }
@@ -139,21 +84,18 @@
     .feed-lesson-title { font-size: 1.05rem; font-weight: 800; color: var(--white); margin-bottom: 0.7rem; line-height: 1.4; }
     .feed-lesson-content { font-size: 0.85rem; color: var(--text-dim); line-height: 1.8; margin-bottom: 1rem; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
     .feed-lesson-content.expanded { display: block; }
-    .feed-read-more { background: none; border: none; color: var(--gold); font-size: 0.82rem; cursor: pointer; font-family: inherit; padding: 0; margin-bottom: 0.8rem; }
+    .feed-read-more { background: none; border: none; color: var(--gold); font-size: 0.82rem; cursor: pointer; font-family: inherit; padding: 0; margin-bottom: 0.8rem; display: block; }
     .feed-reactions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.8rem; }
-    .feed-reaction-btn { background: var(--bg); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 0.3rem 0.7rem; font-size: 0.78rem; cursor: pointer; display: flex; align-items: center; gap: 0.3rem; transition: all 0.2s; font-family: inherit; color: var(--text); }
+    .feed-reaction-btn { background: var(--bg); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 0.3rem 0.7rem; font-size: 0.78rem; cursor: pointer; transition: all 0.2s; font-family: inherit; color: var(--text); }
     .feed-reaction-btn.active { border-color: var(--gold); color: var(--gold); background: var(--gold-dim); }
     .feed-comments-toggle { background: none; border: none; color: var(--text-dim); font-size: 0.78rem; cursor: pointer; font-family: inherit; padding: 0; }
-    .feed-comments-toggle:hover { color: var(--gold); }
-    .feed-comments-area { margin-top: 0.8rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.8rem; }
-    .feed-comment { background: var(--bg); border-radius: 8px; padding: 0.6rem 0.8rem; margin-bottom: 0.5rem; }
+    .feed-comment { background: var(--bg); border-radius: 8px; padding: 0.6rem 0.8rem; margin-bottom: 0.5rem; margin-top: 0.6rem; }
     .feed-comment-author { font-size: 0.7rem; font-weight: 700; color: var(--gold); margin-bottom: 0.2rem; }
     .feed-comment-text { font-size: 0.82rem; color: var(--text); line-height: 1.5; }
     .feed-comment-input { display: flex; gap: 0.5rem; margin-top: 0.6rem; }
     .feed-comment-input input { flex: 1; background: var(--bg); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.5rem 0.8rem; color: var(--text); font-family: inherit; font-size: 0.82rem; outline: none; }
     .feed-comment-input input:focus { border-color: var(--gold); }
     .feed-comment-input button { background: var(--gold); border: none; border-radius: 8px; padding: 0.5rem 0.9rem; color: #0a0a0a; font-weight: 700; font-size: 0.78rem; cursor: pointer; }
-
     .feed-video { background: var(--bg2); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius); overflow: hidden; }
     .feed-video-thumb { width: 100%; height: 200px; position: relative; cursor: pointer; background: #000; overflow: hidden; }
     .feed-video-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -166,14 +108,7 @@
     .feed-video-title { font-size: 0.95rem; font-weight: 700; color: var(--white); margin-bottom: 0.4rem; }
     .feed-video-desc { font-size: 0.82rem; color: var(--text-dim); line-height: 1.6; }
 
-    /* VIDEO PLAYER MODAL */
-    .video-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 500; display: flex; align-items: center; justify-content: center; padding: 1rem; }
-    .video-modal-inner { width: 100%; max-width: 700px; }
-    .video-modal-close { background: rgba(255,255,255,0.1); border: none; color: var(--white); width: 36px; height: 36px; border-radius: 50%; font-size: 1rem; cursor: pointer; margin-bottom: 0.8rem; display: flex; align-items: center; justify-content: center; }
-    .video-embed-wrap { position: relative; padding-bottom: 56.25%; height: 0; }
-    .video-embed-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; border-radius: var(--radius); }
-
-    /* ── BOOKS SCREEN ── */
+    /* BOOKS */
     .books-grid-app { display: grid; grid-template-columns: repeat(2,1fr); gap: 1rem; }
     .book-card-app { background: var(--bg2); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius); overflow: hidden; }
     .book-card-cover { width: 100%; height: 160px; object-fit: cover; display: block; background: var(--bg3); }
@@ -184,11 +119,9 @@
     .book-card-actions .btn { font-size: 0.72rem; padding: 0.4rem 0.7rem; flex: 1; border-radius: 8px; }
     .book-locked { font-size: 0.68rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 0.2rem 0.5rem; color: var(--text-dim); display: inline-block; margin-bottom: 0.5rem; }
     .book-free-badge { font-size: 0.68rem; background: var(--gold-dim); border: 1px solid rgba(201,168,76,0.3); border-radius: 20px; padding: 0.2rem 0.5rem; color: var(--gold); display: inline-block; margin-bottom: 0.5rem; }
-
-    /* BOOK MODAL */
     .book-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 500; overflow-y: auto; padding: 1.5rem 1.2rem; }
     .book-modal-inner { max-width: 600px; margin: 0 auto; }
-    .book-modal-close { background: rgba(255,255,255,0.08); border: none; color: var(--white); width: 36px; height: 36px; border-radius: 50%; font-size: 1rem; cursor: pointer; margin-bottom: 1.2rem; display: flex; align-items: center; justify-content: center; }
+    .book-modal-close-btn { background: rgba(255,255,255,0.08); border: none; color: var(--white); width: 36px; height: 36px; border-radius: 50%; font-size: 1rem; cursor: pointer; margin-bottom: 1.2rem; display: flex; align-items: center; justify-content: center; }
     .book-modal-top { display: flex; gap: 1.2rem; margin-bottom: 1.5rem; }
     .book-modal-cover { width: 100px; height: 140px; object-fit: cover; border-radius: 8px; flex-shrink: 0; }
     .book-modal-title { font-size: 1.2rem; font-weight: 800; color: var(--gold); margin-bottom: 0.6rem; }
@@ -196,15 +129,13 @@
     .book-preview-box { background: var(--bg2); border: 1px solid rgba(201,168,76,0.1); border-radius: var(--radius); padding: 1.2rem; margin-bottom: 1.2rem; position: relative; }
     .book-preview-box h4 { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 0.8rem; }
     .book-preview-text { font-size: 0.85rem; color: var(--text); line-height: 1.8; max-height: 160px; overflow: hidden; position: relative; }
-    .book-preview-fade { position: absolute; bottom: 0; left: 0; right: 0; height: 60px; background: linear-gradient(transparent, var(--bg2)); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 0.4rem; }
+    .book-preview-fade { position: absolute; bottom: 0; left: 0; right: 0; height: 60px; background: linear-gradient(transparent,var(--bg2)); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 0.4rem; }
     .book-preview-fade span { font-size: 0.72rem; color: var(--text-dim); }
     .book-cta { background: var(--gold-dim); border: 1px solid rgba(201,168,76,0.2); border-radius: var(--radius); padding: 1.2rem; text-align: center; }
     .book-cta p { font-size: 0.82rem; color: var(--text-dim); margin-bottom: 0.8rem; }
-
-    /* FREE BOOK READER */
     .book-reader { background: #fff; color: #111; border-radius: var(--radius); padding: 1.5rem; font-size: 0.92rem; line-height: 1.9; margin-bottom: 1.2rem; max-height: 60vh; overflow-y: auto; }
 
-    /* ── DASHBOARD SCREEN ── */
+    /* DASHBOARD */
     .dash-profile { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; padding: 1.2rem; background: var(--bg2); border: 1px solid rgba(201,168,76,0.15); border-radius: var(--radius); }
     .dash-avatar-big { width: 56px; height: 56px; border-radius: 50%; border: 2px solid var(--gold); background: var(--bg3); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 700; color: var(--gold); overflow: hidden; flex-shrink: 0; }
     .dash-avatar-big img { width: 100%; height: 100%; object-fit: cover; }
@@ -221,9 +152,8 @@
     .dash-tool-name { font-size: 0.82rem; font-weight: 700; color: var(--white); }
     .dash-tool-desc { font-size: 0.72rem; color: var(--text-dim); margin-top: 0.2rem; }
     .dash-section-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); margin-bottom: 0.8rem; }
-    .dash-logout { width: 100%; margin-top: 1rem; }
 
-    /* ── EVENTS SCREEN ── */
+    /* EVENTS */
     .event-card-app { background: var(--bg2); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius); padding: 1.2rem; margin-bottom: 1rem; display: flex; gap: 1rem; align-items: flex-start; }
     .event-date-pill { background: var(--gold-dim); border: 1px solid rgba(201,168,76,0.25); border-radius: 10px; padding: 0.6rem 0.7rem; text-align: center; flex-shrink: 0; min-width: 52px; }
     .event-date-day { font-size: 1.4rem; font-weight: 900; color: var(--gold); line-height: 1; }
@@ -240,15 +170,20 @@
     .event-rsvp-btn.rsvped { background: var(--gold-dim); color: var(--gold); border: 1px solid rgba(201,168,76,0.3); }
     .event-rsvp-btn.paid-rsvp { background: rgba(255,80,80,0.1); color: #ff5050; border: 1px solid rgba(255,80,80,0.3); }
 
-    /* ── MODAL OVERLAY ── */
+    /* MODALS */
+    .video-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 500; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+    .video-modal-inner { width: 100%; max-width: 700px; }
+    .video-modal-close { background: rgba(255,255,255,0.1); border: none; color: var(--white); width: 36px; height: 36px; border-radius: 50%; font-size: 1rem; cursor: pointer; margin-bottom: 0.8rem; display: flex; align-items: center; justify-content: center; }
+    .video-embed-wrap { position: relative; padding-bottom: 56.25%; height: 0; }
+    .video-embed-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; border-radius: var(--radius); }
     .modal-overlay-app { position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 300; display: flex; align-items: flex-end; justify-content: center; padding: 0; }
     .modal-sheet { background: var(--bg2); border-radius: 20px 20px 0 0; padding: 1.5rem 1.2rem 2rem; width: 100%; max-width: 600px; max-height: 85vh; overflow-y: auto; animation: slideUp 0.25s ease; }
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     .modal-sheet-handle { width: 40px; height: 4px; background: rgba(255,255,255,0.15); border-radius: 2px; margin: 0 auto 1.2rem; }
     .modal-sheet-title { font-size: 1.1rem; font-weight: 800; color: var(--gold); margin-bottom: 1rem; }
-    .modal-sheet-close { float: right; background: none; border: none; color: var(--text-dim); font-size: 1.2rem; cursor: pointer; margin-top: -0.2rem; }
+    .modal-sheet-close { float: right; background: none; border: none; color: var(--text-dim); font-size: 1.2rem; cursor: pointer; }
 
-    /* ── LOADING ── */
+    /* LOADING */
     .app-loading { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999; }
     .app-loading-logo { font-size: 1rem; font-weight: 900; color: var(--gold); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.5rem; }
     .app-loading-sub { font-size: 0.72rem; color: var(--text-dim); }
@@ -256,25 +191,18 @@
     .loading-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); animation: dot-pulse 1.2s infinite; }
     .loading-dot:nth-child(2) { animation-delay: 0.2s; }
     .loading-dot:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes dot-pulse { 0%,80%,100% { opacity: 0.2; transform: scale(0.8); } 40% { opacity: 1; transform: scale(1); } }
-
+    @keyframes dot-pulse { 0%,80%,100%{opacity:0.2;transform:scale(0.8);}40%{opacity:1;transform:scale(1);} }
     .empty-feed { text-align: center; padding: 3rem 1rem; color: var(--text-dim); font-size: 0.85rem; }
   </style>
 </head>
 <body>
 
-<!-- LOADING SCREEN -->
 <div class="app-loading" id="app-loading">
   <div class="app-loading-logo">Awakened Mind</div>
   <div class="app-loading-sub">Loading your dashboard...</div>
-  <div class="loading-dots">
-    <div class="loading-dot"></div>
-    <div class="loading-dot"></div>
-    <div class="loading-dot"></div>
-  </div>
+  <div class="loading-dots"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div></div>
 </div>
 
-<!-- TOP BAR -->
 <div class="top-bar" id="top-bar" style="display:none;">
   <div class="top-bar-logo">AMA</div>
   <div class="top-bar-right">
@@ -282,22 +210,112 @@
   </div>
 </div>
 
-function loadCompletionStreak() {
-    db.from('profiles').select('completion_streak, last_completed').eq('id', currentUser.id).single().then(function(result) {
-      var data = result.data || {};
-      var streak = data.completion_streak || 0;
-      document.getElementById('streak-circle-num').textContent = streak;
-      var max = Math.max(streak, 30);
-      var circumference = 314;
-      var offset = streak === 0 ? circumference : circumference - (Math.min(streak, max) / max) * circumference;
-      document.getElementById('streak-circle-fill').style.strokeDashoffset = offset;
-      document.getElementById('streak-circle-label').textContent = streak === 0
-        ? 'Complete all tasks to start your streak'
-        : '🔥 ' + streak + ' day' + (streak === 1 ? '' : 's') + ' in a row';
-    });
-}
+<div class="screen-container" id="screen-container" style="display:none;">
 
-  <!-- EVENTS SCREEN -->
+  <!-- TODAY -->
+  <div class="screen active" id="screen-today">
+
+    <!-- COMPLETION STREAK CIRCLE -->
+    <div style="display:flex;flex-direction:column;align-items:center;padding:1.2rem 0 0.5rem;">
+      <div style="font-size:0.68rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:0.8rem;">Completion Streak</div>
+      <div style="position:relative;width:120px;height:120px;margin-bottom:0.4rem;">
+        <svg style="transform:rotate(-90deg);" width="120" height="120" viewBox="0 0 120 120">
+          <circle fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="10" cx="60" cy="60" r="50"/>
+          <circle fill="none" stroke="#c9a84c" stroke-width="10" stroke-linecap="round"
+            cx="60" cy="60" r="50" stroke-dasharray="314"
+            id="streak-circle-fill" stroke-dashoffset="314" style="transition:stroke-dashoffset 1s ease;"/>
+        </svg>
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;">
+          <div style="font-size:2rem;font-weight:900;color:var(--white);line-height:1;" id="streak-circle-num">0</div>
+          <div style="font-size:0.6rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.08em;margin-top:0.2rem;">days</div>
+        </div>
+      </div>
+      <div style="font-size:0.75rem;color:var(--text-dim);text-align:center;" id="streak-circle-label">Complete all tasks to start your streak</div>
+    </div>
+
+    <!-- DAILY GOAL CIRCLE -->
+    <div class="today-hero">
+      <div class="today-greeting" id="today-greeting">Good morning</div>
+      <div class="today-name" id="today-name">Loading...</div>
+      <div class="big-circle-wrap">
+        <svg class="big-circle-svg" width="220" height="220" viewBox="0 0 220 220">
+          <circle class="big-circle-bg" cx="110" cy="110" r="95"/>
+          <circle class="big-circle-fill" id="big-circle-fill" cx="110" cy="110" r="95"
+            stroke-dasharray="596.9" stroke-dashoffset="596.9"/>
+        </svg>
+        <div class="big-circle-centre">
+          <div class="big-circle-percent" id="big-circle-percent">0%</div>
+          <div class="big-circle-sub">Daily Goal</div>
+        </div>
+      </div>
+      <div class="today-complete-msg" id="today-complete-msg">
+        <div class="complete-emoji">🎉</div>
+        <div class="complete-text">All done today!</div>
+        <div class="complete-sub">You crushed it. See you tomorrow.</div>
+      </div>
+    </div>
+
+    <div class="today-stats">
+      <div class="today-stat"><div class="today-stat-num" id="stat-habits">0/0</div><div class="today-stat-label">Habits</div></div>
+      <div class="today-stat"><div class="today-stat-num" id="stat-todos">0/0</div><div class="today-stat-label">To-Do</div></div>
+      <div class="today-stat"><div class="today-stat-num" id="stat-avoided">0/0</div><div class="today-stat-label">Avoided</div></div>
+    </div>
+
+    <div class="today-section">
+      <div class="today-section-title">🔥 Daily Habits</div>
+      <div id="today-habits-list"><div class="today-empty">No daily habits yet. Add them in Dashboard.</div></div>
+    </div>
+    <div class="today-section">
+      <div class="today-section-title">✅ To-Do</div>
+      <div id="today-todos-list"><div class="today-empty">No tasks yet.</div></div>
+    </div>
+    <div class="today-section">
+      <div class="today-section-title">🚫 Not-To-Do</div>
+      <div id="today-nottodos-list"><div class="today-empty">No avoidances yet.</div></div>
+    </div>
+  </div>
+
+  <!-- LEARN -->
+  <div class="screen" id="screen-learn">
+    <div class="section-eyebrow">Feed</div>
+    <div class="screen-title" style="margin-bottom:1.2rem;">Learn</div>
+    <div id="learn-feed"><div class="empty-feed">Loading feed...</div></div>
+  </div>
+
+  <!-- BOOKS -->
+  <div class="screen" id="screen-books">
+    <div class="section-eyebrow">Library</div>
+    <div class="screen-title" style="margin-bottom:1.2rem;">Books</div>
+    <div class="books-grid-app" id="books-grid-app"></div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="screen" id="screen-dashboard">
+    <div class="section-eyebrow">Your Space</div>
+    <div class="screen-title" style="margin-bottom:1.2rem;">Dashboard</div>
+    <div class="dash-profile">
+      <div class="dash-avatar-big" id="dash-avatar-big">?</div>
+      <div class="dash-profile-info">
+        <h2 id="dash-profile-name">Loading...</h2>
+        <p id="dash-profile-email"></p>
+      </div>
+    </div>
+    <div class="dash-section-title">🔥 Your Top Streaks</div>
+    <div class="dash-streak-row" id="dash-streak-row">
+      <div class="dash-streak-card"><div class="dash-streak-num">—</div><div class="dash-streak-label">Loading</div></div>
+    </div>
+    <div class="dash-section-title" style="margin-top:1rem;margin-bottom:0.8rem;">Your Tools</div>
+    <div class="dash-tools">
+      <a href="habits.html" class="dash-tool"><div class="dash-tool-icon">⚙️</div><div class="dash-tool-name">Habits</div><div class="dash-tool-desc">Manage your habit list</div></a>
+      <a href="todo.html" class="dash-tool"><div class="dash-tool-icon">✅</div><div class="dash-tool-name">To-Do List</div><div class="dash-tool-desc">Tasks and avoidances</div></a>
+      <a href="alarm.html" class="dash-tool"><div class="dash-tool-icon">⏰</div><div class="dash-tool-name">Alarms</div><div class="dash-tool-desc">Set daily reminders</div></a>
+      <a href="profile.html" class="dash-tool"><div class="dash-tool-icon">👤</div><div class="dash-tool-name">Profile</div><div class="dash-tool-desc">Update your details</div></a>
+      <a href="admin.html" class="dash-tool hidden" id="dash-admin-tool"><div class="dash-tool-icon">🛠️</div><div class="dash-tool-name">Admin Panel</div><div class="dash-tool-desc">Manage content</div></a>
+    </div>
+    <button class="btn btn-outline" style="width:100%;margin-top:1rem;" id="app-logout-btn">Sign Out</button>
+  </div>
+
+  <!-- EVENTS -->
   <div class="screen" id="screen-events">
     <div class="section-eyebrow">Upcoming</div>
     <div class="screen-title" style="margin-bottom:1.2rem;">Events</div>
@@ -308,26 +326,11 @@ function loadCompletionStreak() {
 
 <!-- BOTTOM NAV -->
 <div class="bottom-nav" id="bottom-nav" style="display:none;">
-  <button class="nav-item" data-screen="learn">
-    <div class="nav-item-icon">📚</div>
-    <div class="nav-label">Learn</div>
-  </button>
-  <button class="nav-item" data-screen="books">
-    <div class="nav-item-icon">📖</div>
-    <div class="nav-label">Books</div>
-  </button>
-  <button class="nav-item nav-item-today active" data-screen="today">
-    <div class="nav-item-icon">🎯</div>
-    <div class="nav-label">Today</div>
-  </button>
-  <button class="nav-item" data-screen="dashboard">
-    <div class="nav-item-icon">🏠</div>
-    <div class="nav-label">Dashboard</div>
-  </button>
-  <button class="nav-item" data-screen="events">
-    <div class="nav-item-icon">🎉</div>
-    <div class="nav-label">Events</div>
-  </button>
+  <button class="nav-item" data-screen="learn"><div class="nav-item-icon">📚</div><div class="nav-label">Learn</div></button>
+  <button class="nav-item" data-screen="books"><div class="nav-item-icon">📖</div><div class="nav-label">Books</div></button>
+  <button class="nav-item nav-item-today active" data-screen="today"><div class="nav-item-icon">🎯</div><div class="nav-label">Today</div></button>
+  <button class="nav-item" data-screen="dashboard"><div class="nav-item-icon">🏠</div><div class="nav-label">Dashboard</div></button>
+  <button class="nav-item" data-screen="events"><div class="nav-item-icon">🎉</div><div class="nav-label">Events</div></button>
 </div>
 
 <!-- VIDEO MODAL -->
@@ -343,7 +346,7 @@ function loadCompletionStreak() {
 <!-- BOOK MODAL -->
 <div class="book-modal hidden" id="book-modal">
   <div class="book-modal-inner">
-    <button class="book-modal-close" id="book-modal-close">✕</button>
+    <button class="book-modal-close-btn" id="book-modal-close">✕</button>
     <div class="book-modal-top">
       <img id="book-modal-cover" class="book-modal-cover" src="" alt="">
       <div>
@@ -365,7 +368,7 @@ function loadCompletionStreak() {
         <a id="book-whatsapp-btn" href="#" target="_blank" class="btn btn-gold" style="width:100%;">📲 Get Full Book on WhatsApp</a>
       </div>
     </div>
-    <button class="book-modal-close btn btn-outline" style="width:100%;margin-top:1rem;" id="book-modal-close2">Close</button>
+    <button class="btn btn-outline" style="width:100%;margin-top:1rem;" id="book-modal-close2">Close</button>
   </div>
 </div>
 
@@ -391,9 +394,8 @@ var WHATSAPP = '254796776986';
 var currentUser = null;
 var todayStr = new Date().toISOString().split('T')[0];
 var allHabits = [], allTodos = [], allBooks = [], allVideos = [], allLessons = [], allEvents = [], myRsvps = [];
-var learnLoaded = false, booksLoaded = false, eventsLoaded = false, dashLoaded = false;
+var learnLoaded = false, booksLoaded = false, eventsLoaded = false;
 
-// GREETING
 function getGreeting() {
   var h = new Date().getHours();
   if (h < 12) return 'Good morning';
@@ -401,7 +403,6 @@ function getGreeting() {
   return 'Good evening';
 }
 
-// AUTH CHECK
 db.auth.getSession().then(function(result) {
   var session = result.data.session;
   if (!session) { window.location.href = 'auth.html'; return; }
@@ -418,13 +419,10 @@ function initApp() {
     var profile = results[0].data;
     var habits = results[1].data || [];
     var todos = results[2].data || [];
-
     allHabits = habits;
     allTodos = todos;
-
     var name = profile ? (profile.full_name || currentUser.email) : currentUser.email;
 
-    // Top bar avatar
     var avatarEl = document.getElementById('top-avatar');
     if (profile && profile.avatar_url) {
       avatarEl.innerHTML = '<img src="' + profile.avatar_url + '" alt="avatar">';
@@ -432,16 +430,13 @@ function initApp() {
       avatarEl.textContent = name.charAt(0).toUpperCase();
     }
 
-    // Today screen
     document.getElementById('today-greeting').textContent = getGreeting();
     document.getElementById('today-name').textContent = name.split(' ')[0];
 
-    // Admin check
     if (profile && profile.is_admin) {
       document.getElementById('dash-admin-tool').classList.remove('hidden');
     }
 
-    // Dashboard profile
     document.getElementById('dash-profile-name').textContent = name;
     document.getElementById('dash-profile-email').textContent = currentUser.email;
     var dashAv = document.getElementById('dash-avatar-big');
@@ -450,19 +445,10 @@ function initApp() {
     } else {
       dashAv.textContent = name.charAt(0).toUpperCase();
     }
-    function loadCompletionStreak() {
-  db.from('profiles').select('completion_streak, last_completed').eq('id', currentUser.id).single().then(function(result) {
-    var data = result.data || {};
-    var streak = data.completion_streak || 0;
-    var el = document.getElementById('completion-streak-banner');
-    if (el) el.textContent = streak === 0 ? 'Start your streak today' : '🔥 ' + streak + ' day' + (streak === 1 ? '' : 's') + ' complete streak';
-  });
-}
 
-renderToday
     renderToday();
-loadDashStreaks();
-loadCompletionStreak();
+    loadCompletionStreak();
+    loadDashStreaks();
 
     document.getElementById('app-loading').style.display = 'none';
     document.getElementById('top-bar').style.display = 'flex';
@@ -471,16 +457,44 @@ loadCompletionStreak();
   });
 }
 
-// ── TODAY SCREEN ──
+function loadCompletionStreak() {
+  db.from('profiles').select('completion_streak, last_completed').eq('id', currentUser.id).single().then(function(result) {
+    var data = result.data || {};
+    var streak = data.completion_streak || 0;
+    document.getElementById('streak-circle-num').textContent = streak;
+    var circumference = 314;
+    var max = Math.max(streak, 30);
+    var offset = streak === 0 ? circumference : circumference - (Math.min(streak, max) / max) * circumference;
+    setTimeout(function() {
+      document.getElementById('streak-circle-fill').style.strokeDashoffset = offset;
+    }, 200);
+    document.getElementById('streak-circle-label').textContent = streak === 0
+      ? 'Complete all tasks to start your streak'
+      : '🔥 ' + streak + ' day' + (streak === 1 ? '' : 's') + ' in a row';
+  });
+}
+
+function updateCompletionStreak() {
+  db.from('profiles').select('completion_streak, last_completed').eq('id', currentUser.id).single().then(function(result) {
+    var data = result.data || {};
+    if (data.last_completed === todayStr) return;
+    var yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    var yesterdayStr = yesterday.toISOString().split('T')[0];
+    var newStreak = data.last_completed === yesterdayStr ? (data.completion_streak || 0) + 1 : 1;
+    db.from('profiles').update({ completion_streak: newStreak, last_completed: todayStr }).eq('id', currentUser.id).then(function() {
+      loadCompletionStreak();
+    });
+  });
+}
+
 function renderToday() {
   var dailyHabits = allHabits;
   var todos = allTodos.filter(function(t) { return t.type === 'todo'; });
   var notTodos = allTodos.filter(function(t) { return t.type === 'not-todo'; });
-
   var habitsDone = dailyHabits.filter(function(h) { return h.last_done === todayStr; }).length;
   var todosDone = todos.filter(function(t) { return t.done_date === todayStr; }).length;
   var notTodosDone = notTodos.filter(function(t) { return t.done_date === todayStr; }).length;
-
   var total = dailyHabits.length + todos.length + notTodos.length;
   var done = habitsDone + todosDone + notTodosDone;
   var pct = total > 0 ? Math.round((done / total) * 100) : 0;
@@ -495,11 +509,13 @@ function renderToday() {
   var fill = document.getElementById('big-circle-fill');
   fill.style.strokeDasharray = circumference;
   setTimeout(function() { fill.style.strokeDashoffset = offset; }, 100);
+
   if (pct === 100) {
-  fill.classList.add('complete');
-  document.getElementById('today-complete-msg').classList.add('show');
-  updateCompletionStreak(pct);
-}
+    fill.classList.add('complete');
+    document.getElementById('today-complete-msg').classList.add('show');
+    updateCompletionStreak();
+  }
+
   renderTodayList('today-habits-list', dailyHabits, 'habit');
   renderTodayList('today-todos-list', todos, 'todo');
   renderTodayList('today-nottodos-list', notTodos, 'not-todo');
@@ -549,30 +565,6 @@ function toggleTodayItem(id, type) {
   }
 }
 
-// ── DASHBOARD STREAKS ──
-function loadCompletionStreak() {
-  db.from('profiles').select('completion_streak, last_completed').eq('id', currentUser.id).single().then(function(result) {
-    var data = result.data || {};
-    var streak = data.completion_streak || 0;
-    var el = document.getElementById('completion-streak-banner');
-    if (el) el.textContent = streak === 0 ? 'Start your streak today' : '🔥 ' + streak + ' day' + (streak === 1 ? '' : 's') + ' complete streak';
-  });
-}
-
-function updateCompletionStreak(pct) {
-  if (pct < 100) return;
-  db.from('profiles').select('completion_streak, last_completed').eq('id', currentUser.id).single().then(function(result) {
-    var data = result.data || {};
-    var today = todayStr;
-    if (data.last_completed === today) return;
-    var yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
-    var yesterdayStr = yesterday.toISOString().split('T')[0];
-    var newStreak = data.last_completed === yesterdayStr ? (data.completion_streak || 0) + 1 : 1;
-    db.from('profiles').update({ completion_streak: newStreak, last_completed: today }).eq('id', currentUser.id).then(function() {
-      loadCompletionStreak();
-    });
-  });
-}
 function loadDashStreaks() {
   db.from('featured_habits').select('slot, habits(*)').eq('user_id', currentUser.id).order('slot').then(function(result) {
     var featured = result.data || [];
@@ -592,29 +584,22 @@ function loadDashStreaks() {
   });
 }
 
-// ── LEARN SCREEN ──
 function loadLearn() {
   if (learnLoaded) return;
   learnLoaded = true;
   var feed = document.getElementById('learn-feed');
   feed.innerHTML = '<div class="empty-feed">Loading...</div>';
-
   Promise.all([
     db.from('lessons').select('*').eq('published', true).order('created_at', { ascending: false }),
     db.from('videos').select('*').eq('published', true).order('created_at', { ascending: false })
   ]).then(function(results) {
     allLessons = results[0].data || [];
     allVideos = results[1].data || [];
-
     var combined = [];
     allLessons.forEach(function(l) { combined.push({ type: 'lesson', data: l, date: new Date(l.created_at) }); });
     allVideos.forEach(function(v) { combined.push({ type: 'video', data: v, date: new Date(v.created_at) }); });
     combined.sort(function(a, b) { return b.date - a.date; });
-
-    if (combined.length === 0) {
-      feed.innerHTML = '<div class="empty-feed">No content yet. Check back soon.</div>';
-      return;
-    }
+    if (combined.length === 0) { feed.innerHTML = '<div class="empty-feed">No content yet. Check back soon.</div>'; return; }
     feed.innerHTML = '';
     combined.forEach(function(item) {
       if (item.type === 'lesson') renderFeedLesson(item.data, feed);
@@ -651,8 +636,7 @@ function renderFeedLesson(lesson, feed) {
   var expanded = false;
   document.getElementById('lrm-' + lesson.id).addEventListener('click', function() {
     expanded = !expanded;
-    var content = document.getElementById('lc-' + lesson.id);
-    content.classList.toggle('expanded', expanded);
+    document.getElementById('lc-' + lesson.id).classList.toggle('expanded', expanded);
     this.textContent = expanded ? 'Show less ↑' : 'Read more →';
   });
 
@@ -661,12 +645,10 @@ function renderFeedLesson(lesson, feed) {
   var commentsOpen = false;
   document.getElementById('lct-' + lesson.id).addEventListener('click', function() {
     commentsOpen = !commentsOpen;
-    var area = document.getElementById('lca-' + lesson.id);
-    area.classList.toggle('hidden', !commentsOpen);
+    document.getElementById('lca-' + lesson.id).classList.toggle('hidden', !commentsOpen);
     this.textContent = commentsOpen ? '💬 Hide comments' : '💬 Comments';
     if (commentsOpen) loadFeedComments(lesson.id);
   });
-
   document.getElementById('lcb-' + lesson.id).addEventListener('click', function() { postFeedComment(lesson.id); });
   document.getElementById('lci-' + lesson.id).addEventListener('keydown', function(e) { if (e.key === 'Enter') postFeedComment(lesson.id); });
 }
@@ -701,7 +683,7 @@ function loadFeedReactions(lessonId) {
 }
 
 function loadFeedComments(lessonId) {
-  db.from('lesson_comments').select('*').eq('lesson_id', lessonId).order('created_at', { ascending: true }).then(function(result) {
+  db.from('lesson_comments').select('*, profiles(full_name)').eq('lesson_id', lessonId).order('created_at', { ascending: true }).then(function(result) {
     var comments = result.data || [];
     var list = document.getElementById('lcl-' + lessonId);
     if (!list) return;
@@ -710,7 +692,8 @@ function loadFeedComments(lessonId) {
     comments.forEach(function(c) {
       var div = document.createElement('div');
       div.className = 'feed-comment';
-      div.innerHTML = '<div class="feed-comment-author">Member</div><div class="feed-comment-text">' + c.content + '</div>';
+      var author = (c.profiles && c.profiles.full_name) ? c.profiles.full_name : 'Member';
+      div.innerHTML = '<div class="feed-comment-author">' + author + '</div><div class="feed-comment-text">' + c.content + '</div>';
       list.appendChild(div);
     });
   });
@@ -744,10 +727,12 @@ function renderFeedVideo(video, feed) {
       '</div>' +
     '</div>';
   feed.appendChild(div);
-
   div.querySelector('.feed-video-thumb').addEventListener('click', function() {
-    if (video.is_paid) { openPaidEventModal({ title: video.title, description: video.description, price: video.price, is_paid: true, _wa_text: 'I want to unlock the video: ' + video.title }); }
-    else { openVideoModal(video.youtube_url); }
+    if (video.is_paid) {
+      openPaidEventModal({ title: video.title, description: video.description, price: video.price, _wa_text: 'I want to unlock the video: ' + video.title });
+    } else {
+      openVideoModal(video.youtube_url);
+    }
   });
 }
 
@@ -764,7 +749,6 @@ function getYoutubeEmbed(url) {
   var id = extractYoutubeId(url);
   return id ? 'https://www.youtube.com/embed/' + id + '?autoplay=1' : null;
 }
-
 function openVideoModal(url) {
   document.getElementById('video-iframe').src = getYoutubeEmbed(url) || '';
   document.getElementById('video-modal').classList.remove('hidden');
@@ -774,7 +758,6 @@ document.getElementById('video-modal-close').addEventListener('click', function(
   document.getElementById('video-modal').classList.add('hidden');
 });
 
-// ── BOOKS SCREEN ──
 function loadBooks() {
   if (booksLoaded) return;
   booksLoaded = true;
@@ -786,9 +769,7 @@ function loadBooks() {
     allBooks.forEach(function(book) {
       var card = document.createElement('div');
       card.className = 'book-card-app';
-      var badge = book.is_free
-        ? '<span class="book-free-badge">📖 Free Read</span>'
-        : '<span class="book-locked">🔒 Paid</span>';
+      var badge = book.is_free ? '<span class="book-free-badge">📖 Free Read</span>' : '<span class="book-locked">🔒 Paid</span>';
       card.innerHTML =
         '<img class="book-card-cover" src="' + (book.cover_url || '') + '" alt="' + book.title + '">' +
         '<div class="book-card-body">' +
@@ -804,7 +785,6 @@ function loadBooks() {
         '</div>';
       grid.appendChild(card);
     });
-
     document.querySelectorAll('.book-preview-btn').forEach(function(btn) {
       btn.addEventListener('click', function() { openBookModal(btn.dataset.id, false); });
     });
@@ -834,32 +814,29 @@ function openBookModal(id, readFull) {
   }
   document.getElementById('book-modal').classList.remove('hidden');
 }
-
 document.getElementById('book-modal-close').addEventListener('click', function() { document.getElementById('book-modal').classList.add('hidden'); });
 document.getElementById('book-modal-close2').addEventListener('click', function() { document.getElementById('book-modal').classList.add('hidden'); });
 
-// ── EVENTS SCREEN ──
 function loadEvents() {
   if (eventsLoaded) return;
   eventsLoaded = true;
   var feed = document.getElementById('events-feed');
-
   db.from('event_rsvps').select('event_id').eq('user_id', currentUser.id).then(function(rsvpRes) {
     myRsvps = (rsvpRes.data || []).map(function(r) { return r.event_id; });
     db.from('events').select('*').eq('published', true).order('event_date', { ascending: true }).then(function(result) {
       allEvents = result.data || [];
-      if (allEvents.length === 0) { feed.innerHTML = '<div class="empty-feed"No upcoming events.</div>'; return; }
+      if (allEvents.length === 0) { feed.innerHTML = '<div class="empty-feed">No upcoming events.</div>'; return; }
       feed.innerHTML = '';
       allEvents.forEach(function(event) {
         var d = new Date(event.event_date);
-var today = new Date(); today.setHours(0,0,0,0);
-var eventDay = new Date(event.event_date); eventDay.setHours(0,0,0,0);
-var isPast = eventDay < today;
-var isRsvped = myRsvps.indexOf(event.id) !== -1;
+        var today = new Date(); today.setHours(0,0,0,0);
+        var eventDay = new Date(event.event_date); eventDay.setHours(0,0,0,0);
+        var isPast = eventDay < today;
+        var isRsvped = myRsvps.indexOf(event.id) !== -1;
+        var rsvpClass = isPast ? 'rsvped' : (event.is_paid ? 'paid-rsvp' : (isRsvped ? 'rsvped' : 'free-rsvp'));
+        var rsvpText = isPast ? 'Ended' : (event.is_paid ? '🎟️ Get Ticket' : (isRsvped ? '✓ Going' : 'RSVP'));
         var div = document.createElement('div');
         div.className = 'event-card-app';
-        var rsvpClass = isPast ? 'rsvped' : (event.is_paid ? 'paid-rsvp' : (isRsvped ? 'rsvped' : 'free-rsvp'));
-var rsvpText = isPast ? 'Ended' : (event.is_paid ? '🎟️ Get Ticket' : (isRsvped ? '✓ Going' : 'RSVP'));
         div.innerHTML =
           '<div class="event-date-pill">' +
             '<div class="event-date-day">' + d.getDate() + '</div>' +
@@ -873,13 +850,13 @@ var rsvpText = isPast ? 'Ended' : (event.is_paid ? '🎟️ Get Ticket' : (isRsv
               (event.event_time ? '<span>🕐 ' + event.event_time + '</span>' : '') +
               (event.online_link ? '<span>🌐 Online</span>' : (event.location ? '<span>📍 ' + event.location + '</span>' : '')) +
             '</div>' +
-            '<button class="event-rsvp-btn ' + rsvpClass + '" data-id="' + event.id + '">' + rsvpText + '</button>' +
+            '<button class="event-rsvp-btn ' + rsvpClass + '" data-id="' + event.id + '"' + (isPast ? ' disabled' : '') + '>' + rsvpText + '</button>' +
             (event.online_link && !event.is_paid && isRsvped ? ' <a href="' + event.online_link + '" target="_blank" class="btn btn-outline" style="font-size:0.72rem;padding:0.3rem 0.7rem;margin-left:0.4rem;">Join →</a>' : '') +
           '</div>';
         feed.appendChild(div);
       });
 
-      document.querySelectorAll('.event-rsvp-btn').forEach(function(btn) {
+      document.querySelectorAll('.event-rsvp-btn:not([disabled])').forEach(function(btn) {
         btn.addEventListener('click', function() {
           var event = allEvents.find(function(e) { return e.id === btn.dataset.id; });
           if (!event) return;
@@ -918,8 +895,6 @@ function openPaidEventModal(event) {
 document.getElementById('paid-event-close').addEventListener('click', function() { document.getElementById('paid-event-modal').classList.add('hidden'); });
 document.getElementById('paid-event-cancel').addEventListener('click', function() { document.getElementById('paid-event-modal').classList.add('hidden'); });
 
-// ── BOTTOM NAV ──
-var screens = { today: true, learn: false, books: false, dashboard: false, events: false };
 document.querySelectorAll('.nav-item').forEach(function(btn) {
   btn.addEventListener('click', function() {
     var target = btn.dataset.screen;
@@ -934,7 +909,6 @@ document.querySelectorAll('.nav-item').forEach(function(btn) {
   });
 });
 
-// ── LOGOUT ──
 document.getElementById('app-logout-btn').addEventListener('click', function() {
   db.auth.signOut().then(function() { window.location.href = 'auth.html'; });
 });
