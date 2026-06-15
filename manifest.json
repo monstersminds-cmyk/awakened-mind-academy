@@ -1,0 +1,21 @@
+{
+  "name": "Apex Mind",
+"short_name": "Apex",
+    "start_url": "/app.html",
+    "display": "standalone",
+    "background_color": "#0a0a0a",
+    "theme_color": "#c9a84c",
+    "orientation": "portrait",
+    "icons": [
+      {
+        "src": "images/AWAKENED_LOGO2.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      },
+      {
+        "src": "images/AWAKENED_LOGO2.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ]
+  }
