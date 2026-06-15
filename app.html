@@ -663,9 +663,10 @@ function loadFeedReactions(lessonId) {
     var container = document.getElementById('lr-' + lessonId);
     if (!container) return;
     container.innerHTML = '';
+    var myReaction = reactions.find(function(rx) { return rx.user_id === currentUser.id; });
     FEED_REACTIONS.forEach(function(r) {
       var count = reactions.filter(function(rx) { return rx.reaction === r.key; }).length;
-      var mine = !!reactions.find(function(rx) { return rx.user_id === currentUser.id && rx.reaction === r.key; });
+      var mine = myReaction && myReaction.reaction === r.key;
       var btn = document.createElement('button');
       btn.className = 'feed-reaction-btn' + (mine ? ' active' : '');
       btn.textContent = r.emoji + (count > 0 ? ' ' + count : '');
@@ -674,7 +675,7 @@ function loadFeedReactions(lessonId) {
           if (wasMine) {
             db.from('lesson_reactions').delete().eq('lesson_id', lessonId).eq('user_id', currentUser.id).eq('reaction', reactionKey).then(function() { loadFeedReactions(lessonId); });
           } else {
-            db.from('lesson_reactions').upsert({ lesson_id: lessonId, user_id: currentUser.id, reaction: reactionKey }).then(function() { loadFeedReactions(lessonId); });
+            db.from('lesson_reactions').upsert({ lesson_id: lessonId, user_id: currentUser.id, reaction: reactionKey }, { onConflict: 'lesson_id,user_id' }).then(function() { loadFeedReactions(lessonId); });
           }
         });
       })(r.key, mine);
